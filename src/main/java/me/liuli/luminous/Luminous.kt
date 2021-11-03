@@ -1,22 +1,46 @@
 package me.liuli.luminous
 
-import com.sun.tools.attach.VirtualMachine
-import com.sun.tools.attach.VirtualMachineDescriptor
-import com.sun.tools.attach.spi.AttachProvider
+import com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER
+import me.liuli.luminous.agent.Agent
+import me.liuli.luminous.loader.Loader
+import java.io.File
+import java.lang.instrument.Instrumentation
+import java.net.URL
+import java.net.URLClassLoader
+
 
 object Luminous {
+    val jarFileAt = File(this.javaClass.protectionDomain.codeSource.location.toURI())
+
     @JvmStatic
     fun main(args: Array<String>) {
-        VirtualMachine.list().forEach {
-            if(it.displayName().startsWith("net.minecraft")){
-                println("${it.id()} ${it.displayName()}")
-                attachVm(it)
+        loadClasspaths(args[0]) // load tools.jar into classpath
+        Loader.main(args.copyOfRange(1, args.size))
+    }
+
+    @JvmStatic
+    fun agentmain(agentArgs: String?, inst: Instrumentation) {
+        Agent.main(agentArgs ?: "", inst)
+    }
+
+    private fun loadClasspaths(paths: String) {
+        for (path in paths.split(":").toTypedArray()) {
+            try {
+                loadClasspath(File(path))
+            } catch (ex: Exception) {
+                ex.printStackTrace()
             }
         }
     }
 
-    fun attachVm(descriptor: VirtualMachineDescriptor) {
-        val vm=VirtualMachine.attach(descriptor)
-//        vm.
+    /**
+     * idk why classpath option cannot load tools.jar
+     * @param jar the jar file want to load
+     */
+    private fun loadClasspath(jar: File) {
+        val classLoaderExt = this.javaClass.classLoader as URLClassLoader
+        val method = URLClassLoader::class.java.getDeclaredMethod("addURL", URL::class.java)
+        method.isAccessible = true
+        method.invoke(classLoaderExt, jar.toURI().toURL())
     }
 }
