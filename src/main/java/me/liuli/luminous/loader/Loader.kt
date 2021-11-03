@@ -13,13 +13,13 @@ object Loader {
 
         LogUtils.logInfo("Find self jar file at: ${Luminous.jarFileAt}")
 
-        val vm = if(args.size>=1){
+        val vm = if (args.size >= 1) {
             AttachUtils.getJvmById(args[0])
-        }else{
+        } else {
             selectJvm()
         }
 
-        if(vm == null) {
+        if (vm == null) {
             LogUtils.logWarn("Action cancelled by user or Target JVM not found.")
             return
         }
