@@ -10,4 +10,8 @@ object AttachUtils {
         vm.loadAgent(jar.absolutePath, "")
         vm.detach()
     }
+
+    fun getJvmById(id: String): VirtualMachineDescriptor? {
+        return VirtualMachine.list().find { it.id() == id }
+    }
 }
