@@ -3,14 +3,19 @@ package me.liuli.luminous.utils.jvm
 object AccessUtils {
     enum class MinecraftEnv {
         NOTCH,
-        SEARGE
+        SEARGE,
+        VANILLA
     }
 
     val currentEnv = try {
-        Class.forName("net.minecraft.client.Minecraft")
-        MinecraftEnv.NOTCH
+        val clazz = Class.forName("net.minecraft.client.Minecraft")
+        if(clazz.declaredFields.any { it.name == "thePlayer" }) {
+            MinecraftEnv.VANILLA
+        } else {
+            MinecraftEnv.SEARGE
+        }
     } catch (e: ClassNotFoundException) {
-        MinecraftEnv.SEARGE
+        MinecraftEnv.NOTCH
     }
 
 //    val classMap = mutableMapOf<String, String>()

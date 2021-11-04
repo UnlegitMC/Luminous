@@ -4,28 +4,30 @@ import com.sun.tools.attach.VirtualMachine
 import com.sun.tools.attach.VirtualMachineDescriptor
 import me.liuli.luminous.Luminous
 import me.liuli.luminous.utils.jvm.AttachUtils
-import me.liuli.luminous.utils.misc.LogUtils
+import me.liuli.luminous.utils.misc.logError
+import me.liuli.luminous.utils.misc.logInfo
+import me.liuli.luminous.utils.misc.logWarn
 import javax.swing.*
 
 object Loader {
-    fun main(args: Array<String>) {
-        LogUtils.logInfo("Welcome to ${Luminous.NAME} v${Luminous.VERSION}")
+    fun main() {
+        logInfo("Welcome to ${Luminous.NAME} v${Luminous.VERSION}")
 
-        LogUtils.logInfo("Find self jar file at: ${Luminous.jarFileAt}")
+        logInfo("Find self jar file at: ${Luminous.jarFileAt}")
 
-        val vm = if (args.size >= 1) {
-            AttachUtils.getJvmById(args[0])
+        val vm = if (System.getProperty("luminous.targetjvm") != null) {
+            AttachUtils.getJvmById(System.getProperty("luminous.targetjvm"))
         } else {
             selectJvm()
         }
 
         if (vm == null) {
-            LogUtils.logWarn("Action cancelled by user or Target JVM not found.")
+            logError("Action cancelled by user or Target JVM not found.")
             return
         }
 
         AttachUtils.attachJarIntoVm(vm, Luminous.jarFileAt)
-        LogUtils.logWarn("Agent has been attached into target jvm.")
+        logWarn("Agent has been attached into target jvm.")
     }
 
     private fun selectJvm(): VirtualMachineDescriptor? {
