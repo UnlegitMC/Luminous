@@ -19,6 +19,10 @@ object Luminous {
 
     @JvmStatic
     fun main(args: Array<String>) {
+        logInfo("Welcome to $NAME v$VERSION")
+
+        logInfo("Find self jar file at: $jarFileAt")
+
         // load tools.jar into classpath
         loadClasspath(if(System.getProperty("luminous.toolsjar") != null) {
             val toolsJar = File(System.getProperty("luminous.toolsjar"))
@@ -43,8 +47,8 @@ object Luminous {
     }
 
     @JvmStatic
-    fun agentmain(agentArgs: String?, inst: Instrumentation) {
-        Agent.main(agentArgs ?: "", inst)
+    fun agentmain(agentArgs: String?, instrumentation: Instrumentation) {
+        Agent.main(agentArgs ?: "", instrumentation)
     }
 
     /**

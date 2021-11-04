@@ -5,16 +5,11 @@ import com.sun.tools.attach.VirtualMachineDescriptor
 import me.liuli.luminous.Luminous
 import me.liuli.luminous.utils.jvm.AttachUtils
 import me.liuli.luminous.utils.misc.logError
-import me.liuli.luminous.utils.misc.logInfo
 import me.liuli.luminous.utils.misc.logWarn
 import javax.swing.*
 
 object Loader {
     fun main() {
-        logInfo("Welcome to ${Luminous.NAME} v${Luminous.VERSION}")
-
-        logInfo("Find self jar file at: ${Luminous.jarFileAt}")
-
         val vm = if (System.getProperty("luminous.targetjvm") != null) {
             AttachUtils.getJvmById(System.getProperty("luminous.targetjvm"))
         } else {
