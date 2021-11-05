@@ -1,9 +1,13 @@
 package me.liuli.luminous.utils.misc
 
 import me.liuli.luminous.Luminous
+import java.text.SimpleDateFormat
+import java.util.*
+
+private val DATE_FORMAT = SimpleDateFormat("HH:mm:ss")
 
 fun log(tag: String, message: String) {
-    println("[${Luminous.NAME}] [$tag] $message")
+    println("[${DATE_FORMAT.format(Date())}] [${Luminous.NAME}/$tag] $message")
 }
 
 fun logInfo(message: String) {

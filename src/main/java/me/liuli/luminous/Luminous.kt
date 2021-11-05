@@ -13,8 +13,10 @@ import java.net.URLClassLoader
 object Luminous {
     const val NAME = "Luminous"
     const val VERSION = "1.0.0"
+    const val RESOURCE = "https://lumires.getfdp.today"
+    const val TITLE = "${Luminous.NAME} v${Luminous.VERSION}"
 
-    val dataDir = File(System.getProperty("user.home"), NAME.lowercase())
+    val dataDir = File(System.getProperty("user.home"), ".config/${NAME}")
     val jarFileAt = File(this.javaClass.protectionDomain.codeSource.location.toURI())
 
     @JvmStatic

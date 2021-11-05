@@ -33,7 +33,7 @@ object Loader {
         val comboBox = JComboBox(model)
         panel.add(comboBox)
 
-        val result = JOptionPane.showConfirmDialog(null, panel, "${Luminous.NAME} v${Luminous.VERSION}", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)
+        val result = JOptionPane.showConfirmDialog(null, panel, Luminous.TITLE, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)
         when (result) {
             JOptionPane.OK_OPTION -> return AttachUtils.getJvmById(comboBox.selectedItem.toString().split(" - ")[0])
         }
