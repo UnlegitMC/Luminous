@@ -22,6 +22,7 @@ repositories {
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_version")
     include(kotlin("stdlib"))
+    include("org.reflections:reflections:0.10.2")
     implementation(files(org.gradle.internal.jvm.Jvm.current().toolsJar))
 }
 
@@ -33,6 +34,8 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     manifest {
         attributes["Main-Class"] = "me.liuli.luminous.Luminous"
         attributes["Agent-Class"] = "me.liuli.luminous.Luminous"
+        attributes["Can-Redefine-Classes"] = true
+        attributes["Can-Retransform-Classes"] = true
     }
 }
 

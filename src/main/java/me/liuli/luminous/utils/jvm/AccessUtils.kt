@@ -1,5 +1,6 @@
 package me.liuli.luminous.utils.jvm
 
+import javassist.ClassPool
 import me.liuli.luminous.Luminous
 import me.liuli.luminous.agent.Agent
 import me.liuli.luminous.utils.extension.getMethodByName
@@ -169,6 +170,9 @@ object AccessUtils {
 
     fun getObfClassByName(name: String)
             = getClassByName(classOverrideMap[name] ?: name)
+
+    fun getCtClass(name: String)
+            = ClassPool.getDefault().getCtClass(classOverrideMap[name] ?: name)
 
     fun getObfFieldByName(clazz: Class<*>, name: String)
             = clazz.getDeclaredField(fieldOverrideMap[clazz.name + "!" + name]?.split("!")?.get(1) ?: name)

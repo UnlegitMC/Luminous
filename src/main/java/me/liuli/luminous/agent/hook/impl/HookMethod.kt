@@ -1,0 +1,36 @@
+package me.liuli.luminous.agent.hook.impl
+
+import me.liuli.luminous.utils.jvm.AccessUtils
+import java.lang.reflect.Method
+
+class HookMethod(val hookFunction: HookFunction, val method: Method, val info: Hook) {
+    val targetMethodName: String
+    val targetMethodSign: String
+    val targetMethod: Method
+
+    init {
+        val deobf = (AccessUtils.methodOverrideMap[hookFunction.targetClass.name + "!" + info.target]
+            ?: (hookFunction.targetClass.name + "!" + info.target)).split("!")
+        targetMethodName = deobf[1]
+        targetMethodSign = deobf[2]
+        targetMethod = AccessUtils.getObfMethodByName(hookFunction.targetClass, targetMethodName, targetMethodSign)
+    }
+
+    fun run(instance: Any, vararg args: Any?): HookReturnInfo {
+        val invokeArgs = mutableListOf<Any?>()
+        val returnInfo = HookReturnInfo()
+
+        if(info.getInstance) {
+            invokeArgs.add(instance)
+        }
+        if(info.returnable) {
+            invokeArgs.add(returnInfo)
+        }
+
+        args.forEach { invokeArgs.add(it) }
+
+        method.invoke(hookFunction, *invokeArgs.toTypedArray())
+
+        return returnInfo
+    }
+}
