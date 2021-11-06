@@ -166,7 +166,7 @@ object AccessUtils {
      * this able to find wrapped classes
      */
     fun getClassByName(name: String)
-            = Agent.instrumentation.allLoadedClasses.find { it.name == name } ?: throw ClassNotFoundException(name)
+            = if(Agent.forgeEnv) { Class.forName(name) } else { Agent.instrumentation.allLoadedClasses.find { it.name == name } ?: throw ClassNotFoundException(name) }
 
     fun getObfClassByName(name: String)
             = getClassByName(classOverrideMap[name] ?: name)

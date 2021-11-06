@@ -17,7 +17,16 @@ object Luminous {
     const val TITLE = "${Luminous.NAME} v${Luminous.VERSION}"
 
     val dataDir = File(System.getProperty("user.home"), ".config/${NAME}")
-    val jarFileAt = File(this.javaClass.protectionDomain.codeSource.location.toURI())
+    val jarFileAt: File
+
+    init {
+        jarFileAt = try {
+            File(this.javaClass.protectionDomain.codeSource.location.toURI())
+        } catch (e: Exception) {
+            e.printStackTrace()
+            File("NOT_FOUND")
+        }
+    }
 
     @JvmStatic
     fun main(args: Array<String>) {

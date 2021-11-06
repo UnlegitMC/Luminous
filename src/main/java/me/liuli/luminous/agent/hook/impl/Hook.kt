@@ -8,8 +8,12 @@ enum class HookType {
 }
 
 class HookReturnInfo(var cancel: Boolean = false, var returnValue: Any? = null) {
-    fun cancel(value: Any?) {
+    fun `return`(value: Any?) {
         cancel = true
         returnValue = value
+    }
+
+    fun `return`() {
+        cancel = true
     }
 }
