@@ -9,6 +9,9 @@ import me.liuli.luminous.utils.misc.logWarn
 import javax.swing.*
 
 object Loader {
+    /**
+     * called from [Luminous.main]
+     */
     fun main() {
         val vm = if (System.getProperty("luminous.targetjvm") != null) {
             AttachUtils.getJvmById(System.getProperty("luminous.targetjvm"))
@@ -25,6 +28,9 @@ object Loader {
         logWarn("Agent has been attached into target jvm.")
     }
 
+    /**
+     * pop a JOptionPane to select a target JVM.
+     */
     private fun selectJvm(): VirtualMachineDescriptor? {
         val panel = JPanel()
         panel.add(JLabel("Select target JVM:"))

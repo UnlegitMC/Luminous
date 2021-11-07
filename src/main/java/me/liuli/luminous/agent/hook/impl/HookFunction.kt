@@ -1,6 +1,11 @@
 package me.liuli.luminous.agent.hook.impl
 
-abstract class HookFunction(val targetClass: Class<*>) {
+import me.liuli.luminous.agent.hook.reflect.WrappedClass
+
+/**
+ * a container for method hooks
+ */
+abstract class HookFunction(val targetClass: Class<*>): WrappedClass(targetClass) {
     private val hookedMethods = mutableListOf<HookMethod>()
 
     init {
@@ -12,6 +17,9 @@ abstract class HookFunction(val targetClass: Class<*>) {
         }
     }
 
+    /**
+     * get the hook method by name and signature, return null if not found
+     */
     fun getHookMethod(name: String, sign: String): HookMethod? {
         return hookedMethods.find { it.targetMethodName == name && it.targetMethodSign == sign }
     }

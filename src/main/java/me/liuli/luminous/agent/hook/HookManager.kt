@@ -26,6 +26,9 @@ object HookManager {
         injected = true
     }
 
+    /**
+     * called from bytecode hooks
+     */
     @JvmStatic
     fun invokeHookMethod(functionName: String, methodName: String, methodSign: String, instance: Any, vararg args: Any?) {
         if(!injected) {
@@ -36,6 +39,10 @@ object HookManager {
         cache = getHookFunction(AccessUtils.getClassByName(functionName))?.getHookMethod(methodName, methodSign)?.run(instance, *args)
     }
 
+    /**
+     * !! THIS FIELD IS NOT THREADSAFE !!
+     * cache for hook method return info
+     */
     @JvmStatic
     var cache: HookReturnInfo? = HookReturnInfo()
 }

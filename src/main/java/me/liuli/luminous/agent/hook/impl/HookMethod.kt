@@ -16,6 +16,9 @@ class HookMethod(val hookFunction: HookFunction, val method: Method, val info: H
         targetMethod = AccessUtils.getObfMethodByName(hookFunction.targetClass, targetMethodName, targetMethodSign)
     }
 
+    /**
+     * called when target method hook point is called
+     */
     fun run(instance: Any, vararg args: Any?): HookReturnInfo {
         val invokeArgs = mutableListOf<Any?>()
         val returnInfo = HookReturnInfo()

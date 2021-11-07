@@ -2,9 +2,7 @@ package me.liuli.luminous.agent.hook.asm
 
 import jdk.internal.org.objectweb.asm.ClassReader
 import jdk.internal.org.objectweb.asm.ClassWriter
-import me.liuli.luminous.Luminous
 import me.liuli.luminous.agent.hook.HookManager
-import java.io.File
 import java.lang.instrument.ClassFileTransformer
 import java.security.ProtectionDomain
 
@@ -17,6 +15,7 @@ class HookTransformer : ClassFileTransformer {
         protectionDomain: ProtectionDomain,
         byteArray: ByteArray
     ): ByteArray {
+        // 如果不是需要 hook 的类，直接返回
         val function = HookManager.getHookFunction(clazz) ?: return byteArray
 
         val cr = ClassReader(byteArray)

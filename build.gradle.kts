@@ -23,6 +23,7 @@ dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_version")
     include(kotlin("stdlib"))
     include("org.reflections:reflections:0.10.2")
+    include("com.beust:klaxon:5.5")
     implementation(files(org.gradle.internal.jvm.Jvm.current().toolsJar))
 }
 

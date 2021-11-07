@@ -3,15 +3,12 @@ package me.liuli.luminous.utils.jvm
 import javassist.ClassPool
 import me.liuli.luminous.Luminous
 import me.liuli.luminous.agent.Agent
-import me.liuli.luminous.utils.extension.getMethodByName
 import me.liuli.luminous.utils.extension.getMethodsByName
 import me.liuli.luminous.utils.extension.signature
 import me.liuli.luminous.utils.misc.HttpUtils
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logInfo
-import me.liuli.luminous.utils.misc.logWarn
 import java.io.File
-import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.nio.charset.StandardCharsets
 import javax.swing.*

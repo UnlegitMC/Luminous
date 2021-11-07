@@ -28,6 +28,24 @@ object Luminous {
         }
     }
 
+    /**
+     * launch the cheat.
+     */
+    fun launch() {
+        logInfo("Loading client...")
+    }
+
+    /**
+     * shutdown the cheat.
+     */
+    fun shutdown() {
+        logInfo("Shutting down $NAME...")
+    }
+
+    /**
+     * !! CALLED BY JVM !!
+     * this will start the injector to inject the agent into Minecraft JVM.
+     */
     @JvmStatic
     fun main(args: Array<String>) {
         logInfo("Welcome to $NAME v$VERSION")
@@ -57,13 +75,13 @@ object Luminous {
         Loader.main()
     }
 
+    /**
+     * !! CALLED BY JVM !!
+     * called when the attach agent is injected into Minecraft JVM.
+     */
     @JvmStatic
     fun agentmain(agentArgs: String?, instrumentation: Instrumentation) {
         Agent.main(agentArgs ?: "", instrumentation)
-    }
-
-    fun startClient() {
-        logInfo("Loading client...")
     }
 
     /**

@@ -1,9 +1,7 @@
 package me.liuli.luminous.utils.jvm
 
 import jdk.internal.org.objectweb.asm.MethodVisitor
-import jdk.internal.org.objectweb.asm.Opcodes
 import jdk.internal.org.objectweb.asm.commons.AdviceAdapter
-import me.liuli.luminous.utils.extension.signature
 
 object ByteCodeUtils {
     fun writeInsnNum(mv: MethodVisitor, num: Int) {

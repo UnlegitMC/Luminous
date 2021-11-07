@@ -18,12 +18,15 @@ object Agent {
     var forgeEnv = false
         private set
 
-    @JvmStatic
+    /**
+     * called from [Luminous.agentmain]
+     */
     fun main(agentArgs: String, instrumentation: Instrumentation) {
         this.instrumentation = instrumentation
 
         AccessUtils.initWithAutoVersionDetect()
 
+        // forge wrapped the namespace, so we need to use reflection to get the real classloader and load the classes into real namespace
         var forgeFlag = false
 
         try {
@@ -46,6 +49,10 @@ object Agent {
         }
     }
 
+    /**
+     * load hooks for the cheat
+     * TODO: real hook loading
+     */
     private fun loadHooks() {
         val mcClass = AccessUtils.getObfClassByName("net.minecraft.client.Minecraft")
 //            val mc = mcClass.invokeObfMethod("getMinecraft", "()Lnet/minecraft/client/Minecraft;")
@@ -59,6 +66,9 @@ object Agent {
         })
     }
 
+    /**
+     * called for namespace switch for forge
+     */
     fun initForForge() {
         forgeEnv = true
 
@@ -69,6 +79,9 @@ object Agent {
         init()
     }
 
+    /**
+     * final initialization for the cheat
+     */
     fun init() {
     }
 }
