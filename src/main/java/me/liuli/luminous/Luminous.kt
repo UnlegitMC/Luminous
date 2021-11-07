@@ -62,6 +62,10 @@ object Luminous {
         Agent.main(agentArgs ?: "", instrumentation)
     }
 
+    fun startClient() {
+        logInfo("Loading client...")
+    }
+
     /**
      * idk why classpath option cannot load tools.jar
      * @param jar the jar file want to load

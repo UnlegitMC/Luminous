@@ -49,26 +49,35 @@ object AccessUtils {
             srgCacheDir.mkdirs()
     }
 
-    fun initByTitle() {
+    fun initWithAutoVersionDetect() {
         val title = getClassByName("org.lwjgl.opengl.Display")
             .getDeclaredMethod("getTitle")
             .invoke(null) as String
 
+        // try to detect the version from title
         if(title.matches(Regex("Minecraft [0-9.]{3,6}"))) {
             init(title.substring("Minecraft ".length))
         } else {
-            logError("Failed to detect current minecraft version")
+            // try to detect the version from forge
+            val version = try {
+                val loaderClass = getClassByName("net.minecraftforge.fml.common.Loader")
+                loaderClass.getDeclaredField("MC_VERSION").get(null) as String
+            } catch (e: Throwable) {
+                logError("Failed to detect Minecraft version...")
 
-            val panel = JPanel()
-            panel.add(JLabel("Select your minecraft version:"))
-            val model = DefaultComboBoxModel<String>()
-            SUPPORT_VERSION_LIST.forEach { model.addElement(it) }
-            val comboBox = JComboBox(model)
-            panel.add(comboBox)
+                val panel = JPanel()
+                panel.add(JLabel("Select your minecraft version:"))
+                val model = DefaultComboBoxModel<String>()
+                SUPPORT_VERSION_LIST.forEach { model.addElement(it) }
+                val comboBox = JComboBox(model)
+                panel.add(comboBox)
 
-            JOptionPane.showConfirmDialog(null, panel, Luminous.TITLE, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE)
+                JOptionPane.showConfirmDialog(null, panel, Luminous.TITLE, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE)
 
-            init(comboBox.selectedItem.toString())
+                comboBox.selectedItem.toString()
+            }
+
+            init(version)
         }
     }
 

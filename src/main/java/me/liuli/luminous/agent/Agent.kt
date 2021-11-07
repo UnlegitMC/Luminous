@@ -6,7 +6,6 @@ import me.liuli.luminous.agent.hook.impl.Hook
 import me.liuli.luminous.agent.hook.impl.HookFunction
 import me.liuli.luminous.agent.hook.impl.HookReturnInfo
 import me.liuli.luminous.agent.hook.impl.HookType
-import me.liuli.luminous.utils.extension.getMethodByName
 import me.liuli.luminous.utils.jvm.AccessUtils
 import java.lang.instrument.Instrumentation
 import java.net.URL
@@ -23,7 +22,7 @@ object Agent {
     fun main(agentArgs: String, instrumentation: Instrumentation) {
         this.instrumentation = instrumentation
 
-        AccessUtils.initByTitle()
+        AccessUtils.initWithAutoVersionDetect()
 
         var forgeFlag = false
 
@@ -63,7 +62,7 @@ object Agent {
     fun initForForge() {
         forgeEnv = true
 
-        AccessUtils.initByTitle()
+        AccessUtils.initWithAutoVersionDetect()
 
         loadHooks()
 
