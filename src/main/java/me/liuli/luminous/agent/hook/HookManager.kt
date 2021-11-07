@@ -9,12 +9,33 @@ import me.liuli.luminous.utils.misc.logWarn
 import java.lang.instrument.Instrumentation
 
 object HookManager {
-    val hookFunctions = mutableListOf<HookFunction>()
+    private val hookFunctions = mutableListOf<HookFunction>()
 
     private var injected = false
 
+    /**
+     * get hook function by [clazz]
+     */
     fun getHookFunction(clazz: Class<*>) = hookFunctions.find { it.targetClass == clazz }
 
+    /**
+     * register hook functions
+     * @throws IllegalStateException if [inject] has been called
+     * @throws IllegalArgumentException if another hook function has been registered for the same class
+     */
+    fun registerHookFunction(hookFunction: HookFunction) {
+        if (injected) {
+            throw IllegalStateException("Hooks has been injected")
+        }
+        if (getHookFunction(hookFunction.targetClass) != null) {
+            throw IllegalArgumentException("Target class has been registered for ${hookFunction.javaClass.name}")
+        }
+        hookFunctions.add(hookFunction)
+    }
+
+    /**
+     * inject hook code into target class by [Instrumentation]
+     */
     fun inject(instrumentation: Instrumentation) {
         instrumentation.addTransformer(HookTransformer(), true)
 

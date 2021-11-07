@@ -29,9 +29,11 @@ class HookMethod(val hookFunction: HookFunction, val method: Method, val info: H
         if(info.returnable) {
             invokeArgs.add(returnInfo)
         }
+        if(info.getParameters) {
+            args.forEach { invokeArgs.add(it) }
+        }
 
-        args.forEach { invokeArgs.add(it) }
-
+        method.isAccessible = true
         method.invoke(hookFunction, *invokeArgs.toTypedArray())
 
         return returnInfo

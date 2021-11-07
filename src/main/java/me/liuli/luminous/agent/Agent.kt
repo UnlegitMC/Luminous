@@ -1,5 +1,6 @@
 package me.liuli.luminous.agent
 
+import javassist.CtClass
 import me.liuli.luminous.Luminous
 import me.liuli.luminous.agent.hook.HookManager
 import me.liuli.luminous.agent.hook.impl.Hook
@@ -7,6 +8,7 @@ import me.liuli.luminous.agent.hook.impl.HookFunction
 import me.liuli.luminous.agent.hook.impl.HookReturnInfo
 import me.liuli.luminous.agent.hook.impl.HookType
 import me.liuli.luminous.utils.jvm.AccessUtils
+import me.liuli.luminous.utils.misc.logError
 import java.lang.instrument.Instrumentation
 import java.net.URL
 import java.net.URLClassLoader
@@ -51,19 +53,21 @@ object Agent {
 
     /**
      * load hooks for the cheat
-     * TODO: real hook loading
      */
     private fun loadHooks() {
-        val mcClass = AccessUtils.getObfClassByName("net.minecraft.client.Minecraft")
-//            val mc = mcClass.invokeObfMethod("getMinecraft", "()Lnet/minecraft/client/Minecraft;")
-//            println(mcClass.getObfFieldValue("mcDataDir", mc) as File)
-        HookManager.hookFunctions.add(object: HookFunction(mcClass) {
-            @Hook(target = "runTick!()V", type = HookType.METHOD_ENTER, returnable = true)
-            fun runTick(returnInfo: HookReturnInfo) {
-                returnInfo.cancel = Math.random() > 0.8
-                println("Tick ${returnInfo.cancel}")
+        AccessUtils.getReflects("me.liuli.luminous.hooks", HookFunction::class.java)
+            .forEach {
+                try {
+                    HookManager.registerHookFunction(it.newInstance())
+                } catch (e: IllegalAccessException) {
+                    // this module looks like a kotlin object
+                    AccessUtils.getKotlinObjectInstance(it)?.let { function ->
+                        HookManager.registerHookFunction(function)
+                    }
+                } catch (e: Throwable) {
+                    logError("Failed to load hook: ${it.name} (${e.javaClass.name}: ${e.message})")
+                }
             }
-        })
     }
 
     /**

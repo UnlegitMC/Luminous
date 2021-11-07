@@ -1,11 +1,9 @@
 package me.liuli.luminous.agent.hook.impl
 
-import me.liuli.luminous.agent.hook.reflect.WrappedClass
-
 /**
  * a container for method hooks
  */
-abstract class HookFunction(val targetClass: Class<*>): WrappedClass(targetClass) {
+abstract class HookFunction(val targetClass: Class<*>) {
     private val hookedMethods = mutableListOf<HookMethod>()
 
     init {

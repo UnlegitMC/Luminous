@@ -8,6 +8,7 @@ import me.liuli.luminous.utils.extension.signature
 import me.liuli.luminous.utils.misc.HttpUtils
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logInfo
+import org.reflections.Reflections
 import java.io.File
 import java.lang.reflect.Method
 import java.nio.charset.StandardCharsets
@@ -195,6 +196,20 @@ object AccessUtils {
                 it.firstOrNull()
             }
         } ?: throw NoSuchMethodException(name)
+    }
+
+    fun <T : Any> getReflects(packagePath: String, clazz: Class<T>): List<Class<out T>> {
+        return Reflections(packagePath)
+            .getSubTypesOf(clazz)
+            .toList()
+    }
+
+    fun <T : Any> getKotlinObjectInstance(clazz: Class<T>): T? {
+        return try {
+            clazz.getDeclaredField("INSTANCE").get(null) as T // kotlin object INSTANCE field is nonnull
+        } catch (e: Exception) {
+            null
+        }
     }
 
     enum class MinecraftEnv {

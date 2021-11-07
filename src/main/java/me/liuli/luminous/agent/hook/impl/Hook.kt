@@ -6,10 +6,11 @@ package me.liuli.luminous.agent.hook.impl
  *
  * @param target the target method (NAME + ! + SIGNATURE)
  * @param type the hook position
+ * @param getParameters post the target method parameters (nullable)
  * @param getInstance post the instance back in hook method parameter (null for static method)
  * @param returnable give a selector to return the value back or not
  */
-annotation class Hook(val target: String, val type: HookType, val getInstance: Boolean = false, val returnable: Boolean = false)
+annotation class Hook(val target: String, val type: HookType, val getParameters: Boolean = false, val getInstance: Boolean = false, val returnable: Boolean = false)
 
 /**
  * select which position to inject the hook bytecode in MethodVisitor
