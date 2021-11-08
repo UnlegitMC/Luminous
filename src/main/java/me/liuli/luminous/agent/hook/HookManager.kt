@@ -37,14 +37,14 @@ object HookManager {
      * inject hook code into target class by [Instrumentation]
      */
     fun inject(instrumentation: Instrumentation) {
+        injected = true
+
         instrumentation.addTransformer(HookTransformer(), true)
 
         // reload class after transform
         hookFunctions.forEach { function ->
             instrumentation.retransformClasses(function.targetClass)
         }
-
-        injected = true
     }
 
     /**

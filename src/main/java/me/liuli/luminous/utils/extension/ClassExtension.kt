@@ -61,7 +61,7 @@ val Method.signature: String
         sb.append(')')
             .append(if (this.returnType === Void.TYPE) { "V" } else { java.lang.reflect.Array.newInstance(this.returnType, 0).toString().let { it.substring(1, it.indexOf('@')) } })
 
-        return sb.toString()
+        return sb.toString().replace(".", "/")
     }
 
 val Class<*>.ctClass: CtClass

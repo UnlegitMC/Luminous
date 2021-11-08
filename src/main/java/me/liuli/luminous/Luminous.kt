@@ -5,6 +5,8 @@ import me.liuli.luminous.loader.Loader
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logInfo
 import me.liuli.luminous.utils.misc.logWarn
+import me.liuli.luminous.utils.misc.logger
+import org.apache.logging.log4j.core.Logger
 import java.io.File
 import java.lang.instrument.Instrumentation
 import java.net.URL
@@ -18,6 +20,8 @@ object Luminous {
 
     val dataDir = File(System.getProperty("user.home"), ".config/${NAME}")
     val jarFileAt: File
+    var isAgent = true
+        private set
 
     init {
         jarFileAt = try {
@@ -48,6 +52,7 @@ object Luminous {
      */
     @JvmStatic
     fun main(args: Array<String>) {
+        this.isAgent = false
         logInfo("Welcome to $NAME v$VERSION")
 
         logInfo("Find self jar file at: $jarFileAt")

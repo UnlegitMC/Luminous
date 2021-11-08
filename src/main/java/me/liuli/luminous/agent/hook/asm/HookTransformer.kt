@@ -21,7 +21,7 @@ class HookTransformer : ClassFileTransformer {
         val cr = ClassReader(byteArray)
         val cw = ClassWriter(cr, ClassWriter.COMPUTE_FRAMES)
         val cv = HookClassVisitor(cw, function)
-        cr.accept(cv, ClassReader.SKIP_FRAMES or ClassReader.SKIP_DEBUG)
+        cr.accept(cv, ClassReader.EXPAND_FRAMES)
 
         return cw.toByteArray()
     }

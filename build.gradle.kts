@@ -24,6 +24,8 @@ dependencies {
     include(kotlin("stdlib"))
     include("org.reflections:reflections:0.10.2")
     include("com.beust:klaxon:5.5")
+    include("net.minecrell:terminalconsoleappender:1.3.0")
+    include("org.jline:jline-terminal-jansi:3.20.0")
     implementation(files(org.gradle.internal.jvm.Jvm.current().toolsJar))
 }
 
@@ -31,6 +33,8 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     archiveClassifier.set("")
     configurations = mutableListOf(include)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    exclude("**/Log4j2Plugins.dat")
 
     manifest {
         attributes["Main-Class"] = "me.liuli.luminous.Luminous"

@@ -3,12 +3,23 @@ package me.liuli.luminous.loader
 import com.sun.tools.attach.VirtualMachine
 import com.sun.tools.attach.VirtualMachineDescriptor
 import me.liuli.luminous.Luminous
+import me.liuli.luminous.loader.connect.Message
+import me.liuli.luminous.loader.connect.MessageThread
+import me.liuli.luminous.loader.console.Console
+import me.liuli.luminous.loader.console.ConsoleCompleter
 import me.liuli.luminous.utils.jvm.AttachUtils
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logWarn
+import java.io.File
 import javax.swing.*
+import kotlin.system.exitProcess
 
 object Loader {
+    private val consoleThread = Thread {
+        Console().start()
+    }
+    val messageThread = MessageThread()
+
     /**
      * called from [Luminous.main]
      */
@@ -23,6 +34,9 @@ object Loader {
             logError("Action cancelled by user or Target JVM not found.")
             return
         }
+
+        messageThread.start()
+        consoleThread.start()
 
         AttachUtils.attachJarIntoVm(vm, Luminous.jarFileAt)
         logWarn("Agent has been attached into target jvm.")
@@ -45,5 +59,16 @@ object Loader {
         }
 
         return null
+    }
+
+    fun shutdownLoader() {
+        if(consoleThread.isAlive)
+            consoleThread.interrupt()
+
+        if(messageThread.isAlive)
+            messageThread.interrupt()
+
+        logWarn("Shutting down loader...")
+        exitProcess(0)
     }
 }

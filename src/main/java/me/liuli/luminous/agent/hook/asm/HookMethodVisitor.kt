@@ -38,13 +38,11 @@ class HookMethodVisitor(val hookMethod: HookMethod, methodVisitor: MethodVisitor
         }
         ByteCodeUtils.writeInsnNum(mv, hookMethod.targetMethod.parameters.size)
         mv.visitTypeInsn(ANEWARRAY, "java/lang/Object")
-        if(hookMethod.targetMethod.parameters.isNotEmpty()) {
-            for(i in 0 until hookMethod.targetMethod.parameters.size) {
-                mv.visitInsn(DUP)
-                ByteCodeUtils.writeInsnNum(mv, i)
-                mv.visitVarInsn(ALOAD, i + 1)
-                mv.visitInsn(AASTORE)
-            }
+        hookMethod.targetMethod.parameters.forEachIndexed { index, _ ->
+            mv.visitInsn(DUP)
+            ByteCodeUtils.writeInsnNum(mv, index)
+            mv.visitVarInsn(ALOAD, index + 1)
+            mv.visitInsn(AASTORE)
         }
         mv.visitMethodInsn(INVOKESTATIC, "me/liuli/luminous/agent/hook/HookManager", "invokeHookMethod", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;[Ljava/lang/Object;)V")
         // inject the ifeq return check if returnable is true

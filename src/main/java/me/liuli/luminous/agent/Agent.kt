@@ -7,8 +7,11 @@ import me.liuli.luminous.agent.hook.impl.Hook
 import me.liuli.luminous.agent.hook.impl.HookFunction
 import me.liuli.luminous.agent.hook.impl.HookReturnInfo
 import me.liuli.luminous.agent.hook.impl.HookType
+import me.liuli.luminous.loader.Loader
+import me.liuli.luminous.loader.connect.MessageThread
 import me.liuli.luminous.utils.jvm.AccessUtils
 import me.liuli.luminous.utils.misc.logError
+import java.io.File
 import java.lang.instrument.Instrumentation
 import java.net.URL
 import java.net.URLClassLoader
@@ -20,11 +23,14 @@ object Agent {
     var forgeEnv = false
         private set
 
+    val messageThread = MessageThread()
+
     /**
      * called from [Luminous.agentmain]
      */
     fun main(agentArgs: String, instrumentation: Instrumentation) {
         this.instrumentation = instrumentation
+        messageThread.start()
 
         AccessUtils.initWithAutoVersionDetect()
 
@@ -48,6 +54,8 @@ object Agent {
 
         if(!forgeFlag) {
             init()
+        } else if(messageThread.isAlive) {
+            messageThread.interrupt()
         }
     }
 
@@ -75,6 +83,7 @@ object Agent {
      */
     fun initForForge() {
         forgeEnv = true
+        messageThread.start()
 
         AccessUtils.initWithAutoVersionDetect()
 
