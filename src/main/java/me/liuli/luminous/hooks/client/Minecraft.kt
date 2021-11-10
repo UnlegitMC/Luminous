@@ -1,6 +1,5 @@
 package me.liuli.luminous.hooks.client
 
-import me.liuli.luminous.Luminous
 import me.liuli.luminous.agent.hook.impl.Hook
 import me.liuli.luminous.agent.hook.impl.HookFunction
 import me.liuli.luminous.agent.hook.impl.HookType

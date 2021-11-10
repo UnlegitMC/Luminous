@@ -3,14 +3,11 @@ package me.liuli.luminous.loader
 import com.sun.tools.attach.VirtualMachine
 import com.sun.tools.attach.VirtualMachineDescriptor
 import me.liuli.luminous.Luminous
-import me.liuli.luminous.loader.connect.Message
 import me.liuli.luminous.loader.connect.MessageThread
 import me.liuli.luminous.loader.console.Console
-import me.liuli.luminous.loader.console.ConsoleCompleter
 import me.liuli.luminous.utils.jvm.AttachUtils
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logWarn
-import java.io.File
 import javax.swing.*
 import kotlin.system.exitProcess
 
@@ -38,7 +35,9 @@ object Loader {
         messageThread.start()
         consoleThread.start()
 
-        AttachUtils.attachJarIntoVm(vm, Luminous.jarFileAt)
+        Thread {
+            AttachUtils.attachJarIntoVm(vm, Luminous.jarFileAt)
+        }.start()
         logWarn("Agent has been attached into target jvm.")
     }
 

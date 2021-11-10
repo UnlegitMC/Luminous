@@ -5,8 +5,6 @@ import me.liuli.luminous.loader.Loader
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logInfo
 import me.liuli.luminous.utils.misc.logWarn
-import me.liuli.luminous.utils.misc.logger
-import org.apache.logging.log4j.core.Logger
 import java.io.File
 import java.lang.instrument.Instrumentation
 import java.net.URL
@@ -18,7 +16,8 @@ object Luminous {
     const val RESOURCE = "https://lumires.getfdp.today"
     const val TITLE = "${Luminous.NAME} v${Luminous.VERSION}"
 
-    val dataDir = File(System.getProperty("user.home"), ".config/${NAME}")
+    val cacheDir = File(System.getProperty("user.home"), ".cache/${NAME}")
+    val configDir = File(System.getProperty("user.home"), ".config/${NAME}")
     val jarFileAt: File
     var isAgent = true
         private set
@@ -30,6 +29,9 @@ object Luminous {
             e.printStackTrace()
             File("NOT_FOUND")
         }
+
+        if(cacheDir.exists().not()) cacheDir.mkdirs()
+        if(configDir.exists().not()) configDir.mkdirs()
     }
 
     /**

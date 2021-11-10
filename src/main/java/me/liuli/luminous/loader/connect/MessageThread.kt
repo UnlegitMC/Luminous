@@ -3,7 +3,6 @@ package me.liuli.luminous.loader.connect
 import com.beust.klaxon.Klaxon
 import me.liuli.luminous.Luminous
 import me.liuli.luminous.utils.misc.LogUtils
-import me.liuli.luminous.utils.misc.logInfo
 import java.io.File
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -17,7 +16,7 @@ class MessageThread : Thread() {
     private val buf = ByteArray(1024) // max size of a UDP packet
 
     init {
-        File(Luminous.dataDir, "SOCKET_${if(Luminous.isAgent) {"CLIENT"} else {"SERVER"}}_PORT").writeBytes(socket.localPort.toString().toByteArray())
+        File(Luminous.cacheDir, "SOCKET_${if(Luminous.isAgent) {"CLIENT"} else {"SERVER"}}_PORT").writeBytes(socket.localPort.toString().toByteArray())
     }
 
     override fun run() {
@@ -43,7 +42,7 @@ class MessageThread : Thread() {
     fun send(msg: Message) {
         val json = Klaxon().toJsonString(msg)
         val packet = DatagramPacket(json.toByteArray(), json.length, InetAddress.getLocalHost(),
-            File(Luminous.dataDir, "SOCKET_${if(Luminous.isAgent) {"SERVER"} else {"CLIENT"}}_PORT").readText().toInt())
+            File(Luminous.cacheDir, "SOCKET_${if(Luminous.isAgent) {"SERVER"} else {"CLIENT"}}_PORT").readText().toInt())
         socket.send(packet)
     }
 }

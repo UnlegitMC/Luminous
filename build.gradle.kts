@@ -22,7 +22,6 @@ repositories {
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_version")
     include(kotlin("stdlib"))
-    include("org.reflections:reflections:0.10.2")
     include("com.beust:klaxon:5.5")
     include("net.minecrell:terminalconsoleappender:1.3.0")
     include("org.jline:jline-terminal-jansi:3.20.0")

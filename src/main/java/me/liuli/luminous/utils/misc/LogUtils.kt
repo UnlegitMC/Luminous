@@ -7,6 +7,7 @@ import me.liuli.luminous.loader.connect.Message
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.apache.logging.log4j.core.config.plugins.util.PluginManager
 
 object LogUtils {
     lateinit var logger: Logger
@@ -14,6 +15,7 @@ object LogUtils {
 
     init {
         if(!Luminous.isAgent) {
+            PluginManager.addPackage("net.minecrell.terminalconsole")
             logger = LogManager.getLogger(Luminous.NAME)
         }
     }

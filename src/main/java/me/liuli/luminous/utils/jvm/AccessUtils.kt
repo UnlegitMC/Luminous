@@ -1,6 +1,5 @@
 package me.liuli.luminous.utils.jvm
 
-import javassist.ClassPool
 import me.liuli.luminous.Luminous
 import me.liuli.luminous.agent.Agent
 import me.liuli.luminous.utils.extension.getMethodsByName
@@ -8,7 +7,8 @@ import me.liuli.luminous.utils.extension.signature
 import me.liuli.luminous.utils.misc.HttpUtils
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logInfo
-import org.reflections.Reflections
+import org.apache.logging.log4j.core.config.plugins.util.PluginRegistry
+import org.apache.logging.log4j.core.config.plugins.util.ResolverUtil
 import java.io.File
 import java.lang.reflect.Method
 import java.nio.charset.StandardCharsets
@@ -25,7 +25,7 @@ object AccessUtils {
             "1.11", "1.11.1", "1.11.2",
             "1.12", "1.12.1", "1.12.2")
 
-    val srgCacheDir = File(Luminous.dataDir, "srg")
+    val srgCacheDir = File(Luminous.cacheDir, "srg")
 
     val currentEnv = try {
         val clazz = getClassByName("net.minecraft.client.Minecraft")
@@ -178,9 +178,6 @@ object AccessUtils {
     fun getObfClassByName(name: String)
             = getClassByName(classOverrideMap[name] ?: name)
 
-    fun getCtClass(name: String)
-            = ClassPool.getDefault().getCtClass(classOverrideMap[name] ?: name)
-
     fun getObfFieldByName(clazz: Class<*>, name: String)
             = clazz.getDeclaredField(fieldOverrideMap[clazz.name + "!" + name]?.split("!")?.get(1) ?: name)
 
@@ -198,10 +195,36 @@ object AccessUtils {
         } ?: throw NoSuchMethodException(name)
     }
 
-    fun <T : Any> getReflects(packagePath: String, clazz: Class<T>): List<Class<out T>> {
-        return Reflections(packagePath)
-            .getSubTypesOf(clazz)
-            .toList()
+    /**
+     * scan classes with specified superclass like what Reflections do but with log4j [ResolverUtil]
+     * @author liulihaocai
+     */
+    fun <T : Any> resolvePackage(packagePath: String, clazz: Class<T>): List<Class<out T>> {
+        // use resolver in log4j to scan classes in target package
+        val resolver = ResolverUtil()
+
+        // set class loader
+        resolver.classLoader = clazz.classLoader
+
+        // set package to scan
+        resolver.findInPackage(object : PluginRegistry.PluginTest() {
+            override fun matches(type: Class<*>?): Boolean {
+                return true
+            }
+        }, packagePath)
+
+        // use a list to cache classes
+        val list = mutableListOf<Class<out T>>()
+
+        for(resolved in resolver.classes) {
+            // check if class is assignable from target class
+            if(clazz.isAssignableFrom(resolved)) {
+                // add to list
+                list.add(resolved as Class<out T>)
+            }
+        }
+
+        return list
     }
 
     fun <T : Any> getKotlinObjectInstance(clazz: Class<T>): T? {

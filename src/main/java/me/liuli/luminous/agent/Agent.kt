@@ -1,17 +1,11 @@
 package me.liuli.luminous.agent
 
-import javassist.CtClass
 import me.liuli.luminous.Luminous
 import me.liuli.luminous.agent.hook.HookManager
-import me.liuli.luminous.agent.hook.impl.Hook
 import me.liuli.luminous.agent.hook.impl.HookFunction
-import me.liuli.luminous.agent.hook.impl.HookReturnInfo
-import me.liuli.luminous.agent.hook.impl.HookType
-import me.liuli.luminous.loader.Loader
 import me.liuli.luminous.loader.connect.MessageThread
 import me.liuli.luminous.utils.jvm.AccessUtils
 import me.liuli.luminous.utils.misc.logError
-import java.io.File
 import java.lang.instrument.Instrumentation
 import java.net.URL
 import java.net.URLClassLoader
@@ -63,7 +57,7 @@ object Agent {
      * load hooks for the cheat
      */
     private fun loadHooks() {
-        AccessUtils.getReflects("me.liuli.luminous.hooks", HookFunction::class.java)
+        AccessUtils.resolvePackage("me.liuli.luminous.hooks", HookFunction::class.java)
             .forEach {
                 try {
                     HookManager.registerHookFunction(it.newInstance())

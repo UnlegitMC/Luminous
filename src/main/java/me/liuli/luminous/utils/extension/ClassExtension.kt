@@ -1,7 +1,5 @@
 package me.liuli.luminous.utils.extension
 
-import javassist.ClassPool
-import javassist.CtClass
 import me.liuli.luminous.utils.jvm.AccessUtils
 import java.lang.reflect.Method
 
@@ -63,6 +61,3 @@ val Method.signature: String
 
         return sb.toString().replace(".", "/")
     }
-
-val Class<*>.ctClass: CtClass
-    get() = ClassPool.getDefault().getCtClass(this.name)
