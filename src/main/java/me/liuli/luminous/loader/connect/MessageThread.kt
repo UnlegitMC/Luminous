@@ -2,6 +2,7 @@ package me.liuli.luminous.loader.connect
 
 import com.beust.klaxon.Klaxon
 import me.liuli.luminous.Luminous
+import me.liuli.luminous.loader.connect.messages.LogMessage
 import me.liuli.luminous.utils.misc.LogUtils
 import java.io.File
 import java.net.DatagramPacket
@@ -49,6 +50,7 @@ class MessageThread : Thread() {
 
         when(message.type) {
             "cmd" -> println("COMMAND EXEC $message")
+//            "complete" ->
             "log" -> {
                 val log = Klaxon().parse<LogMessage>(message.data) ?: return
                 LogUtils.log(log.log4jLevel, log.message)

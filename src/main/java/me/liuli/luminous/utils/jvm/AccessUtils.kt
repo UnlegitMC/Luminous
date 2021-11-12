@@ -9,6 +9,7 @@ import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logInfo
 import org.apache.logging.log4j.core.config.plugins.util.PluginRegistry
 import org.apache.logging.log4j.core.config.plugins.util.ResolverUtil
+import org.lwjgl.opengl.Display
 import java.io.File
 import java.lang.reflect.Method
 import java.nio.charset.StandardCharsets
@@ -48,9 +49,7 @@ object AccessUtils {
     }
 
     fun initWithAutoVersionDetect() {
-        val title = getClassByName("org.lwjgl.opengl.Display")
-            .getDeclaredMethod("getTitle")
-            .invoke(null) as String
+        val title = Display.getTitle()
 
         // try to detect the version from title
         if(title.matches(Regex("Minecraft [0-9.]{3,6}"))) {

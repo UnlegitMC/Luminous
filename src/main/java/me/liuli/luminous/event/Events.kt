@@ -8,6 +8,8 @@ class PreMotionEvent : Event()
 
 class PostMotionEvent : Event()
 
+class JumpEvent : EventCancellable()
+
 class TickEvent : Event()
 
 class WorldEvent(val world: Any?) : Event()
@@ -16,7 +18,7 @@ class KeyEvent(val key: Int) : Event()
 
 class PushOutEvent : EventCancellable()
 
-class AttackEvent(val targetEntity: Any) : Event()
+class AttackEvent(val targetEntity: Any) : EventCancellable()
 
 class Render2DEvent(val partialTicks: Float) : Event()
 

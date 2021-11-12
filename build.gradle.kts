@@ -25,7 +25,8 @@ dependencies {
     include("com.beust:klaxon:5.5")
     include("net.minecrell:terminalconsoleappender:1.3.0")
     include("org.jline:jline-terminal-jansi:3.20.0")
-    implementation(files(org.gradle.internal.jvm.Jvm.current().toolsJar))
+    implementation("org.lwjgl.lwjgl:lwjgl:2.9.3") // this dependency is included in Minecraft environment
+    implementation(files(org.gradle.internal.jvm.Jvm.current().toolsJar)) // this dependency will be loaded dynamically
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {

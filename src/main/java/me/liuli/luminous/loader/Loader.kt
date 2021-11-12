@@ -38,6 +38,7 @@ object Loader {
         Thread {
             AttachUtils.attachJarIntoVm(vm, Luminous.jarFileAt)
         }.start()
+
         logWarn("Agent has been attached into target jvm.")
     }
 

@@ -23,3 +23,19 @@ fun logError(message: String) {
 fun logDebug(message: String) {
     log(Level.DEBUG, message)
 }
+
+fun logInfo(message: Any) {
+    log(Level.INFO, message.toString())
+}
+
+fun logWarn(message: Any) {
+    log(Level.WARN, message.toString())
+}
+
+fun logError(message: Any) {
+    log(Level.ERROR, message.toString())
+}
+
+fun logDebug(message: Any) {
+    log(Level.DEBUG, message.toString())
+}

@@ -1,6 +1,6 @@
 package me.liuli.luminous.event
 
-class EventManager {
+object EventManager {
     private val listeners = mutableMapOf<Class<*>, MutableList<ListenerMethod>>()
 
     /**
@@ -20,6 +20,7 @@ class EventManager {
      * call [event] listeners
      */
     fun callEvent(event: Event) {
+        println(event.javaClass.name)
         listeners[event.javaClass]?.sortedBy { it.priority }?.forEach {
             if(it.listener.listen) {
                 try {
