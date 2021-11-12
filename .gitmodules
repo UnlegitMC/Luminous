@@ -1,0 +1,3 @@
+[submodule "LumiRes"]
+	path = LumiRes
+	url = git@github.com:UnlegitMC/LumiRes.git

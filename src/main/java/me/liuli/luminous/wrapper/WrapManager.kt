@@ -26,7 +26,11 @@ object WrapManager {
                 EnumWrapType.FIELD -> {
                     val field = AccessUtils.getObfFieldByName(targetClass, it.name)
                     field.isAccessible = true
-                    return field.get(instance)
+                    return if(args.isEmpty()) {
+                        field.get(instance)
+                    } else {
+                        field.set(instance, args[0])
+                    }
                 }
                 EnumWrapType.METHOD -> {
                     val info = it.name.split("!")
