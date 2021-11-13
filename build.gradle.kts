@@ -80,11 +80,11 @@ tasks.register("genWrapper") {
 }
 val wrapMap = mutableMapOf<String, WrappedClass>()
 
-class WrappedField(modifier: Int, val name: String, val type: String) {
+class WrappedField(val modifier: Int, val name: String, val type: String) {
     val isStatic = modifier and 8 != 0
     val isFinal = modifier and 16 != 0
 }
-class WrappedMethod(modifier: Int, val name: String, val type: String, val args: List<String>) {
+class WrappedMethod(val modifier: Int, val name: String, val type: String, val args: List<String>) {
     val isStatic = modifier and 8 != 0
 }
 class WrappedClass(val name: String, val superclass: String) {
@@ -115,8 +115,13 @@ class WrappedClass(val name: String, val superclass: String) {
         val type = processType(wf.type)
         val instance = if(wf.isStatic) "null" else "theInstance"
         if(type.isNotEmpty()) {
-            sb.append("${if (isForStatic) {"\t\t"} else {"\t"}}${if (wf.isFinal) {"val"} else {"var"}} ${wf.name}: $type? get() { return ${processWrapHead(type)}WrapManager.getter($instance, \"$name\", \"${wf.name}\")${processWrapTail(type)} }")
-            if(!wf.isFinal) sb.append(" set(value) { WrapManager.setter($instance, \"$name\", \"${wf.name}\", value${processWrapGet(type)}) }")
+            sb.append("${if (isForStatic) {"\t\t"} else {"\t"}}${if (wf.isFinal) {"val"} else {"var"}} ${wf.name}: $type? ")
+            putJvmName(sb, "F_GET_${wf.modifier}_${wf.name}")
+            sb.append("get() { return ${processWrapHead(type)}WrapManager.getter($instance, \"$name\", \"${wf.name}\")${processWrapTail(type)} }")
+            if(!wf.isFinal) {
+                putJvmName(sb, "F_SET_${wf.modifier}_${wf.name}")
+                sb.append("set(value) { WrapManager.setter($instance, \"$name\", \"${wf.name}\", value${processWrapGet(type)}) }")
+            }
             sb.append("\n")
         }
     }
@@ -134,12 +139,19 @@ class WrappedClass(val name: String, val superclass: String) {
             "p$cnt: ${processType(it).let { if(it.isEmpty()) { "Any" }else{ it } }}?"
         }
         if(type.isNotEmpty() && !hasMethod(wm.name)) {
-            sb.append("${if (isForStatic) {"\t\t"} else {"\t"}}@JvmName(\"M${Math.random().toString().split(".")[1]}\") fun ${split[0]}($args)")
+            sb.append(if (isForStatic) {"\t\t"} else {"\t"})
+            putJvmName(sb, "M_${wm.modifier}_${split[0]}")
+            sb.append("fun ${split[0]}($args)")
             if(type!="Unit") sb.append(": $type?")
             sb.append("{ ${if(type!="Unit"){"return"}else{""}} ${processWrapHead(type)}WrapManager.call($instance, \"$name\", \"${split[0]}\", \"${split[1].replace("\$", "\\\$")}\"")
             if(args.isNotEmpty()) sb.append(", ${argsStr.substring(0, argsStr.length-1)}")
             sb.append(")${if(type!="Unit"){processWrapTail(type)}else{""}} }\n")
         }
+    }
+
+    private fun putJvmName(sb: StringBuilder, tag: String) {
+        sb.append("@JvmName(\"$tag\") ")
+//        sb.append("@JvmName(\"$tag${Math.random().toString().split(".")[1]}\") ")
     }
 
     private fun processType(type: String): String {

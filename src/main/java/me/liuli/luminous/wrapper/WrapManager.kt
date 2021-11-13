@@ -1,6 +1,5 @@
 package me.liuli.luminous.wrapper
 
-import me.liuli.luminous.utils.extension.get
 import me.liuli.luminous.utils.extension.getMethodByName
 import me.liuli.luminous.utils.jvm.AccessUtils
 

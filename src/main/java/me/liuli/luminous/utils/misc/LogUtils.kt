@@ -2,8 +2,8 @@ package me.liuli.luminous.utils.misc
 
 import me.liuli.luminous.Luminous
 import me.liuli.luminous.agent.Agent
-import me.liuli.luminous.loader.connect.messages.LogMessage
 import me.liuli.luminous.loader.connect.Message
+import me.liuli.luminous.loader.connect.messages.LogMessage
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
