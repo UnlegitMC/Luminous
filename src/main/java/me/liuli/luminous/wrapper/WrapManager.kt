@@ -51,6 +51,6 @@ object WrapManager {
     fun setter(instance: Any?, className: String, name: String, value: Any?)
             = AccessUtils.getObfFieldByName(AccessUtils.getObfClassByName(className), name).also { it.isAccessible = true }.set(instance, value)
 
-    fun invoke(instance: Any?, className: String, name: String, desc: String, vararg args: Any?)
+    fun call(instance: Any?, className: String, name: String, desc: String, vararg args: Any?)
             = AccessUtils.getObfMethodByName(AccessUtils.getObfClassByName(className), name, desc).also { it.isAccessible = true }.invoke(instance, *args)
 }

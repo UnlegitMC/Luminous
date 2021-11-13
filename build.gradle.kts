@@ -2,7 +2,6 @@ plugins {
     kotlin("jvm") version "1.5.31"
     java
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("io.gitlab.arturbosch.detekt") version "1.18.1"
 }
 
 group = "me.liuli.luminous"
@@ -20,7 +19,6 @@ repositories {
 }
 
 dependencies {
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_version")
     include(kotlin("stdlib"))
     include("com.beust:klaxon:5.5")
     include("net.minecrell:terminalconsoleappender:1.3.0")
@@ -35,6 +33,7 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     exclude("**/Log4j2Plugins.dat")
+    exclude("**/module-info.class")
 
     manifest {
         attributes["Main-Class"] = "me.liuli.luminous.Luminous"
@@ -49,15 +48,6 @@ tasks {
         dependsOn(shadowJar)
     }
 }
-
-detekt {
-    toolVersion = "$detekt_version"
-    source = files("$projectDir")
-    config = files("$projectDir/detekt.yml")
-    basePath = projectDir.absolutePath
-    autoCorrect = true
-}
-tasks.getByPath("detekt").onlyIf { gradle.startParameter.taskNames.any { it.contains("detekt") } }
 
 tasks.register("genWrapper") {
     doFirst {
@@ -100,17 +90,20 @@ class WrappedMethod(modifier: Int, val name: String, val type: String, val args:
 class WrappedClass(val name: String, val superclass: String) {
     val fields = mutableListOf<WrappedField>()
     val methods = mutableListOf<WrappedMethod>()
+    val superType: String
+        get() = processType(superclass)
 
     fun writeTo(file: File) {
         val sb = StringBuilder()
-        val superType = processType(superclass)
 
         sb.append("package wrapped.${name.substring(0, name.lastIndexOf("."))}\n\n")
         sb.append("import me.liuli.luminous.wrapper.WrapManager\n\n")
         sb.append("open class ${name.substring(name.lastIndexOf(".") + 1)}(${if(superType.startsWith("wrapped")) {""} else {"val "}}theInstance: Any)${if(superType.startsWith("wrapped")) {":$superType(theInstance)"}else{""}} {\n")
         fields.forEach { putField(sb, it, false) }
+        methods.forEach { putMethod(sb, it, false) }
         sb.append("\tcompanion object {\n")
         fields.forEach { putField(sb, it, true) }
+        methods.forEach { putMethod(sb, it, true) }
         sb.append("\t}\n")
         sb.append("}")
 
@@ -125,6 +118,27 @@ class WrappedClass(val name: String, val superclass: String) {
             sb.append("${if (isForStatic) {"\t\t"} else {"\t"}}${if (wf.isFinal) {"val"} else {"var"}} ${wf.name}: $type? get() { return ${processWrapHead(type)}WrapManager.getter($instance, \"$name\", \"${wf.name}\")${processWrapTail(type)} }")
             if(!wf.isFinal) sb.append(" set(value) { WrapManager.setter($instance, \"$name\", \"${wf.name}\", value${processWrapGet(type)}) }")
             sb.append("\n")
+        }
+    }
+
+    private fun putMethod(sb: StringBuilder, wm: WrappedMethod, isForStatic: Boolean) {
+        if(isForStatic != wm.isStatic) return
+        val type = processType(wm.type).let { if(it == "void") "Unit" else it }
+        val instance = if(wm.isStatic) "null" else "theInstance"
+        val split = wm.name.split("!")
+        var cnt = -1
+        var argsStr = ""
+        val args = wm.args.joinToString(", ") {
+            cnt++
+            argsStr+="p$cnt,"
+            "p$cnt: ${processType(it).let { if(it.isEmpty()) { "Any" }else{ it } }}?"
+        }
+        if(type.isNotEmpty() && !hasMethod(wm.name)) {
+            sb.append("${if (isForStatic) {"\t\t"} else {"\t"}}@JvmName(\"M${Math.random().toString().split(".")[1]}\") fun ${split[0]}($args)")
+            if(type!="Unit") sb.append(": $type?")
+            sb.append("{ ${if(type!="Unit"){"return"}else{""}} ${processWrapHead(type)}WrapManager.call($instance, \"$name\", \"${split[0]}\", \"${split[1].replace("\$", "\\\$")}\"")
+            if(args.isNotEmpty()) sb.append(", ${argsStr.substring(0, argsStr.length-1)}")
+            sb.append(")${if(type!="Unit"){processWrapTail(type)}else{""}} }\n")
         }
     }
 
@@ -173,5 +187,12 @@ class WrappedClass(val name: String, val superclass: String) {
         } else {
             ""
         }
+    }
+
+    private fun hasMethod(name: String, recursive: Boolean = false): Boolean {
+        if(superType.startsWith("wrapped") && wrapMap[superclass.replace(".", "/")]!!.hasMethod(name, true)) {
+            return true
+        }
+        return recursive && methods.any { it.name == name }
     }
 }
