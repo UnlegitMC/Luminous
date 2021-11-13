@@ -19,12 +19,12 @@ class MinecraftHook : HookFunction(AccessUtils.getObfClassByName("net.minecraft.
             EventManager.callEvent(KeyEvent(if (Keyboard.getEventKey() == 0) { Keyboard.getEventCharacter().code + 256 } else { Keyboard.getEventKey() }))
         }
         EventManager.callEvent(TickEvent())
+        println(Minecraft.theMinecraft?.thePlayer?.posX)
     }
 
     @Hook(target = "loadWorld!(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", type = HookType.METHOD_ENTER, getParameters = true)
     fun loadWorld(world: Any?, worldName: String) {
         EventManager.callEvent(WorldEvent(world))
-//        Minecraft.theMinecraft!!.thePlayer?.
     }
 
     @Hook(target = "shutdown!()V", type = HookType.METHOD_ENTER)

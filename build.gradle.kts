@@ -64,8 +64,8 @@ tasks.register("genWrapper") {
         var curClass = ""
         File(project.projectDir, "LumiRes/wrap.map").forEachLine {
             val split = it.split(" ")
-            if (split.size == 1) {
-                wrapMap[split[0]] = WrappedClass(split[0].replace("/", "."))
+            if (split.size == 2) {
+                wrapMap[split[0]] = WrappedClass(split[0].replace("/", "."), split[1])
                 curClass = split[0]
             } else if (split.size == 3) {
                 if (split[1].contains("!")) {
@@ -97,16 +97,17 @@ class WrappedField(modifier: Int, val name: String, val type: String) {
 class WrappedMethod(modifier: Int, val name: String, val type: String, val args: List<String>) {
     val isStatic = modifier and 8 != 0
 }
-class WrappedClass(val name: String) {
+class WrappedClass(val name: String, val superclass: String) {
     val fields = mutableListOf<WrappedField>()
     val methods = mutableListOf<WrappedMethod>()
 
     fun writeTo(file: File) {
         val sb = StringBuilder()
+        val superType = processType(superclass)
 
         sb.append("package wrapped.${name.substring(0, name.lastIndexOf("."))}\n\n")
         sb.append("import me.liuli.luminous.wrapper.WrapManager\n\n")
-        sb.append("class ${name.substring(name.lastIndexOf(".") + 1)}(val theInstance: Any) {\n")
+        sb.append("open class ${name.substring(name.lastIndexOf(".") + 1)}(${if(superType.startsWith("wrapped")) {""} else {"val "}}theInstance: Any)${if(superType.startsWith("wrapped")) {":$superType(theInstance)"}else{""}} {\n")
         fields.forEach { putField(sb, it, false) }
         sb.append("\tcompanion object {\n")
         fields.forEach { putField(sb, it, true) }
