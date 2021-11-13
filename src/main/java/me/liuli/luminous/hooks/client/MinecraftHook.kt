@@ -8,9 +8,9 @@ import me.liuli.luminous.event.EventManager
 import me.liuli.luminous.event.KeyEvent
 import me.liuli.luminous.event.TickEvent
 import me.liuli.luminous.event.WorldEvent
-import me.liuli.luminous.utils.extension.invokeObfMethod
 import me.liuli.luminous.utils.jvm.AccessUtils
 import org.lwjgl.input.Keyboard
+import wrapped.net.minecraft.client.Minecraft
 
 class MinecraftHook : HookFunction(AccessUtils.getObfClassByName("net.minecraft.client.Minecraft")) {
     @Hook(target = "runTick!()V", type = HookType.METHOD_ENTER)
@@ -24,6 +24,7 @@ class MinecraftHook : HookFunction(AccessUtils.getObfClassByName("net.minecraft.
     @Hook(target = "loadWorld!(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", type = HookType.METHOD_ENTER, getParameters = true)
     fun loadWorld(world: Any?, worldName: String) {
         EventManager.callEvent(WorldEvent(world))
+//        Minecraft.theMinecraft!!.thePlayer?.
     }
 
     @Hook(target = "shutdown!()V", type = HookType.METHOD_ENTER)

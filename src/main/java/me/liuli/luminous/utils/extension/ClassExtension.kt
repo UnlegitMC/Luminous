@@ -43,7 +43,7 @@ val Method.signature: String
             val field = Method::class.java.getDeclaredField("signature")
             field.isAccessible = true
             val signature = field.get(this) as String?
-            if(signature!=null) return signature
+            if (signature != null) return signature
         } catch (e: IllegalAccessException) {
             e.printStackTrace()
         } catch (e: NoSuchFieldException) {

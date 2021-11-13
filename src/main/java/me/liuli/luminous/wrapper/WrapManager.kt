@@ -1,5 +1,6 @@
 package me.liuli.luminous.wrapper
 
+import me.liuli.luminous.utils.extension.get
 import me.liuli.luminous.utils.extension.getMethodByName
 import me.liuli.luminous.utils.jvm.AccessUtils
 
@@ -43,4 +44,13 @@ object WrapManager {
         }
         throw IllegalAccessException("Unable to find annotation for method")
     }
+
+    fun getter(instance: Any?, className: String, name: String)
+            = AccessUtils.getObfFieldByName(AccessUtils.getObfClassByName(className), name).get(instance)
+
+    fun setter(instance: Any?, className: String, name: String, value: Any?)
+            = AccessUtils.getObfFieldByName(AccessUtils.getObfClassByName(className), name).set(instance, value)
+
+    fun invoke(instance: Any?, className: String, name: String, desc: String, vararg args: Any?)
+            = AccessUtils.getObfMethodByName(AccessUtils.getObfClassByName(className), name, desc).invoke(instance, *args)
 }
