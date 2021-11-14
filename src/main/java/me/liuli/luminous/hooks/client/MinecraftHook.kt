@@ -10,7 +10,6 @@ import me.liuli.luminous.event.TickEvent
 import me.liuli.luminous.event.WorldEvent
 import me.liuli.luminous.utils.jvm.AccessUtils
 import org.lwjgl.input.Keyboard
-import wrapped.net.minecraft.client.Minecraft
 import wrapped.net.minecraft.client.multiplayer.WorldClient
 
 class MinecraftHook : HookFunction(AccessUtils.getObfClassByName("net.minecraft.client.Minecraft")) {
@@ -20,7 +19,6 @@ class MinecraftHook : HookFunction(AccessUtils.getObfClassByName("net.minecraft.
             EventManager.callEvent(KeyEvent(if (Keyboard.getEventKey() == 0) { Keyboard.getEventCharacter().code + 256 } else { Keyboard.getEventKey() }))
         }
         EventManager.callEvent(TickEvent())
-        println(Minecraft.getMinecraft()!!.thePlayer?.posX)
     }
 
     @Hook(target = "loadWorld!(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", type = HookType.METHOD_ENTER, getParameters = true)

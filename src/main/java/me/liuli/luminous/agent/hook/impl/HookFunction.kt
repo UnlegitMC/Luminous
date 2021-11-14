@@ -18,7 +18,7 @@ abstract class HookFunction(val targetClass: Class<*>) {
     /**
      * get the hook method by name and signature, return null if not found
      */
-    fun getHookMethod(name: String, sign: String): HookMethod? {
-        return hookedMethods.find { it.targetMethodName == name && it.targetMethodSign == sign }
+    fun getHookMethods(name: String, sign: String): List<HookMethod> {
+        return hookedMethods.filter { it.targetMethodName == name && it.targetMethodSign == sign }
     }
 }

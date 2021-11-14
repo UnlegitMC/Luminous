@@ -4,7 +4,9 @@ import me.liuli.luminous.agent.Agent
 import me.liuli.luminous.agent.hook.asm.HookTransformer
 import me.liuli.luminous.agent.hook.impl.HookFunction
 import me.liuli.luminous.agent.hook.impl.HookReturnInfo
+import me.liuli.luminous.utils.extension.signature
 import me.liuli.luminous.utils.jvm.AccessUtils
+import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logWarn
 import java.lang.instrument.Instrumentation
 
@@ -43,7 +45,11 @@ object HookManager {
 
         // reload class after transform
         hookFunctions.forEach { function ->
-            instrumentation.retransformClasses(function.targetClass)
+            try {
+                instrumentation.retransformClasses(function.targetClass)
+            } catch (e: Throwable) {
+                logError("Failed to inject hook: ${function.javaClass.name} ($e)")
+            }
         }
     }
 
@@ -51,13 +57,14 @@ object HookManager {
      * called from bytecode hooks
      */
     @JvmStatic
-    fun invokeHookMethod(functionName: String, methodName: String, methodSign: String, instance: Any, vararg args: Any?) {
+    fun invokeHookMethod(functionName: String, methodName: String, methodSign: String, hookName: String, hookSign: String, instance: Any, vararg args: Any?) {
         if(!injected) {
             logWarn("Reloading client...")
             Agent.initForForge()
             injected = true
         }
-        cache = getHookFunction(AccessUtils.getClassByName(functionName))?.getHookMethod(methodName, methodSign)?.run(instance, *args)
+        cache = getHookFunction(AccessUtils.getClassByName(functionName))?.getHookMethods(methodName, methodSign)
+            ?.find { it.method.name == hookName && it.method.signature == hookSign }?.run(instance, *args)
     }
 
     /**

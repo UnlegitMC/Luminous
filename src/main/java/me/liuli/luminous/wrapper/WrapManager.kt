@@ -52,4 +52,7 @@ object WrapManager {
 
     fun call(instance: Any?, className: String, name: String, desc: String, vararg args: Any?)
             = AccessUtils.getObfMethodByName(AccessUtils.getObfClassByName(className), name, desc).also { it.isAccessible = true }.invoke(instance, *args)
+
+    fun origin(className: String)
+            = AccessUtils.getObfClassByName(className)
 }

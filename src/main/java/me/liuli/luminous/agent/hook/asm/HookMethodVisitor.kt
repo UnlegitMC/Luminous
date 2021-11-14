@@ -6,31 +6,34 @@ import jdk.internal.org.objectweb.asm.Opcodes
 import jdk.internal.org.objectweb.asm.commons.AdviceAdapter
 import me.liuli.luminous.agent.hook.impl.HookMethod
 import me.liuli.luminous.agent.hook.impl.HookType
+import me.liuli.luminous.utils.extension.signature
 import me.liuli.luminous.utils.jvm.ByteCodeUtils
 import java.lang.reflect.Modifier
 
-class HookMethodVisitor(val hookMethod: HookMethod, methodVisitor: MethodVisitor, access: Int, name: String, desc: String) : AdviceAdapter(Opcodes.ASM5, methodVisitor, access, name, desc) {
+class HookMethodVisitor(val hookMethodList: List<HookMethod>, methodVisitor: MethodVisitor, access: Int, name: String, desc: String) : AdviceAdapter(Opcodes.ASM5, methodVisitor, access, name, desc) {
     override fun onMethodEnter() {
-        if(hookMethod.info.type == HookType.METHOD_ENTER) {
-            injectCall() // inject the hook if the hook type is method enter
+        hookMethodList.filter { it.info.type == HookType.METHOD_ENTER }.forEach {
+            injectCall(it) // inject the hook if the hook type is method enter
         }
     }
 
     override fun onMethodExit(p0: Int) {
         super.onMethodExit(p0)
-        if(hookMethod.info.type == HookType.METHOD_EXIT) {
-            injectCall() // inject the hook if the hook type is method exit
+        hookMethodList.filter { it.info.type == HookType.METHOD_EXIT }.forEach {
+            injectCall(it) // inject the hook if the hook type is method enter
         }
     }
 
     /**
      * inject byte code to the method for calling the hook method
      */
-    private fun injectCall() {
+    private fun injectCall(hookMethod: HookMethod) {
         // inject simple hook to pass the parameters to HookManager
         mv.visitLdcInsn(hookMethod.hookFunction.targetClass.name)
         mv.visitLdcInsn(hookMethod.targetMethodName)
         mv.visitLdcInsn(hookMethod.targetMethodSign)
+        mv.visitLdcInsn(hookMethod.method.name)
+        mv.visitLdcInsn(hookMethod.method.signature)
         if(Modifier.isStatic(hookMethod.targetMethod.modifiers)) {
             mv.visitInsn(ACONST_NULL) // pass null for static method
         } else {
@@ -38,13 +41,34 @@ class HookMethodVisitor(val hookMethod: HookMethod, methodVisitor: MethodVisitor
         }
         ByteCodeUtils.writeInsnNum(mv, hookMethod.targetMethod.parameters.size)
         mv.visitTypeInsn(ANEWARRAY, "java/lang/Object")
-        hookMethod.targetMethod.parameters.forEachIndexed { index, _ ->
+        var i = 1
+        hookMethod.targetMethod.parameters.forEachIndexed { index, parameter ->
             mv.visitInsn(DUP)
             ByteCodeUtils.writeInsnNum(mv, index)
-            mv.visitVarInsn(ALOAD, index + 1)
+            when(parameter.type.name) {
+                "int" -> {
+                    mv.visitVarInsn(ILOAD, i)
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;")
+                }
+                "long" -> {
+                    mv.visitVarInsn(LLOAD, i)
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;")
+                }
+                "float" -> {
+                    mv.visitVarInsn(FLOAD, i)
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;")
+                }
+                "double" -> {
+                    mv.visitVarInsn(DLOAD, i)
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;")
+                    i++
+                }
+                else -> mv.visitVarInsn(ALOAD, i)
+            }
+            i++
             mv.visitInsn(AASTORE)
         }
-        mv.visitMethodInsn(INVOKESTATIC, "me/liuli/luminous/agent/hook/HookManager", "invokeHookMethod", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;[Ljava/lang/Object;)V")
+        mv.visitMethodInsn(INVOKESTATIC, "me/liuli/luminous/agent/hook/HookManager", "invokeHookMethod", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;[Ljava/lang/Object;)V")
         // inject the ifeq return check if returnable is true
         if(hookMethod.info.returnable) {
             val label=Label()
@@ -70,7 +94,12 @@ class HookMethodVisitor(val hookMethod: HookMethod, methodVisitor: MethodVisitor
                 if(flag.isNotEmpty()) {
                     mv.visitMethodInsn(INVOKEVIRTUAL, cast, "${name}Value",
                         "()" + java.lang.reflect.Array.newInstance(type, 0).toString().let { it.substring(1, it.indexOf('@')) })
-                    mv.visitInsn(IRETURN)
+                    when(name) {
+                        "double" -> mv.visitInsn(DRETURN)
+                        "float" -> mv.visitInsn(FRETURN)
+                        "long" -> mv.visitInsn(LRETURN)
+                        else -> mv.visitInsn(IRETURN)
+                    }
                 } else {
                     mv.visitInsn(ARETURN)
                 }

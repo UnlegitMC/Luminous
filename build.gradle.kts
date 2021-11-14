@@ -95,38 +95,41 @@ class WrappedClass(val name: String, val superclass: String) {
 
     fun writeTo(file: File) {
         val sb = StringBuilder()
+        val classNameField = "CNF_${Math.random().toString().split(".")[1].substring(0,5)}"
 
         sb.append("package wrapped.${name.substring(0, name.lastIndexOf("."))}\n\n")
         sb.append("import me.liuli.luminous.wrapper.WrapManager\n\n")
-        sb.append("open class ${name.substring(name.lastIndexOf(".") + 1)}(${if(superType.startsWith("wrapped")) {""} else {"val "}}theInstance: Any)${if(superType.startsWith("wrapped")) {":$superType(theInstance)"}else{""}} {\n")
-        fields.forEach { putField(sb, it, false) }
-        methods.forEach { putMethod(sb, it, false) }
+        sb.append("open class ${name.substring(name.lastIndexOf(".") + 1)}(${if(superType.startsWith("wrapped")) {""} else {"val "}}theInstance: Any = originalClass.newInstance())${if(superType.startsWith("wrapped")) {":$superType(theInstance)"}else{""}} {\n")
+        fields.forEach { putField(sb, it, classNameField, false) }
+        methods.forEach { putMethod(sb, it, classNameField, false) }
         sb.append("\tcompanion object {\n")
-        fields.forEach { putField(sb, it, true) }
-        methods.forEach { putMethod(sb, it, true) }
+        sb.append("\t\tval $classNameField = \"$name\"\n")
+        sb.append("\t\tval originalClass: Class<*> @JvmName(\"ORIGIN_${Math.random().toString().split(".")[1].substring(0,5)}\") get() = WrapManager.origin($classNameField)\n")
+        fields.forEach { putField(sb, it, classNameField, true) }
+        methods.forEach { putMethod(sb, it, classNameField, true) }
         sb.append("\t}\n")
         sb.append("}")
 
         file.writeText(sb.toString())
     }
 
-    private fun putField(sb: StringBuilder, wf: WrappedField, isForStatic: Boolean) {
+    private fun putField(sb: StringBuilder, wf: WrappedField, classNameField: String, isForStatic: Boolean) {
         if(isForStatic != wf.isStatic) return
         val type = processType(wf.type)
         val instance = if(wf.isStatic) "null" else "theInstance"
         if(type.isNotEmpty()) {
             sb.append("${if (isForStatic) {"\t\t"} else {"\t"}}${if (wf.isFinal) {"val"} else {"var"}} ${wf.name}: $type? ")
-            putJvmName(sb, "F_GET_${wf.modifier}_${wf.name}")
-            sb.append("get() { return ${processWrapHead(type)}WrapManager.getter($instance, \"$name\", \"${wf.name}\")${processWrapTail(type)} }")
+            putJvmName(sb, "G${wf.modifier}_${wf.name}")
+            sb.append("get() { return ${processWrapHead(type)}WrapManager.getter($instance, $classNameField, \"${wf.name}\")${processWrapTail(type)} }")
             if(!wf.isFinal) {
-                putJvmName(sb, "F_SET_${wf.modifier}_${wf.name}")
-                sb.append("set(value) { WrapManager.setter($instance, \"$name\", \"${wf.name}\", value${processWrapGet(type)}) }")
+                putJvmName(sb, "S${wf.modifier}_${wf.name}")
+                sb.append("set(value) { WrapManager.setter($instance, $classNameField, \"${wf.name}\", value${processWrapGet(type)}) }")
             }
             sb.append("\n")
         }
     }
 
-    private fun putMethod(sb: StringBuilder, wm: WrappedMethod, isForStatic: Boolean) {
+    private fun putMethod(sb: StringBuilder, wm: WrappedMethod, classNameField: String, isForStatic: Boolean) {
         if(isForStatic != wm.isStatic) return
         val type = processType(wm.type).let { if(it == "void") "Unit" else it }
         val instance = if(wm.isStatic) "null" else "theInstance"
@@ -135,15 +138,16 @@ class WrappedClass(val name: String, val superclass: String) {
         var argsStr = ""
         val args = wm.args.joinToString(", ") {
             cnt++
-            argsStr+="p$cnt,"
-            "p$cnt: ${processType(it).let { if(it.isEmpty()) { "Any" }else{ it } }}?"
+            val typ = processType(it)
+            argsStr+="p$cnt${processWrapGet(typ)},"
+            "p$cnt: ${typ.ifEmpty { "Any" }}?"
         }
         if(type.isNotEmpty() && !hasMethod(wm.name)) {
             sb.append(if (isForStatic) {"\t\t"} else {"\t"})
-            putJvmName(sb, "M_${wm.modifier}_${split[0]}")
+            putJvmName(sb, "M${wm.modifier}_${split[0]}")
             sb.append("fun ${split[0]}($args)")
             if(type!="Unit") sb.append(": $type?")
-            sb.append("{ ${if(type!="Unit"){"return"}else{""}} ${processWrapHead(type)}WrapManager.call($instance, \"$name\", \"${split[0]}\", \"${split[1].replace("\$", "\\\$")}\"")
+            sb.append("{ ${if(type!="Unit"){"return"}else{""}} ${processWrapHead(type)}WrapManager.call($instance, $classNameField, \"${split[0]}\", \"${split[1].replace("\$", "\\\$")}\"")
             if(args.isNotEmpty()) sb.append(", ${argsStr.substring(0, argsStr.length-1)}")
             sb.append(")${if(type!="Unit"){processWrapTail(type)}else{""}} }\n")
         }
