@@ -3,6 +3,7 @@ package me.liuli.luminous.agent.hook
 import me.liuli.luminous.agent.Agent
 import me.liuli.luminous.agent.hook.asm.HookTransformer
 import me.liuli.luminous.agent.hook.impl.HookFunction
+import me.liuli.luminous.agent.hook.impl.HookMethod
 import me.liuli.luminous.agent.hook.impl.HookReturnInfo
 import me.liuli.luminous.utils.extension.signature
 import me.liuli.luminous.utils.jvm.AccessUtils
@@ -12,6 +13,7 @@ import java.lang.instrument.Instrumentation
 
 object HookManager {
     private val hookFunctions = mutableListOf<HookFunction>()
+    private val hookMethodCache = mutableMapOf<String, HookMethod>()
 
     private var injected = false
 
@@ -33,6 +35,9 @@ object HookManager {
             throw IllegalArgumentException("Target class has been registered for ${hookFunction.javaClass.name}")
         }
         hookFunctions.add(hookFunction)
+        hookFunction.hookedMethods.forEach {
+            hookMethodCache["${hookFunction.javaClass.name}/${it.method.name}!${it.method.signature}"] = it
+        }
     }
 
     /**
@@ -57,14 +62,13 @@ object HookManager {
      * called from bytecode hooks
      */
     @JvmStatic
-    fun invokeHookMethod(functionName: String, methodName: String, methodSign: String, hookName: String, hookSign: String, instance: Any, vararg args: Any?) {
+    fun invokeHookMethod(hookName: String, instance: Any?, vararg args: Any?) {
         if(!injected) {
             logWarn("Reloading client...")
             Agent.initForForge()
             injected = true
         }
-        cache = getHookFunction(AccessUtils.getClassByName(functionName))?.getHookMethods(methodName, methodSign)
-            ?.find { it.method.name == hookName && it.method.signature == hookSign }?.run(instance, *args)
+        cache = hookMethodCache[hookName]?.run(instance, *args)
     }
 
     /**

@@ -12,9 +12,8 @@ class Console : SimpleTerminalConsole() {
     override fun isRunning() = true
 
     override fun runCommand(command: String) {
-        if(Loader.listeningConsole) {
-            Loader.consoleMessage = command
-            logInfo("EZ $command")
+        if(Luminous.listeningConsole) {
+            Luminous.consoleMessage = command
             return
         }
         if(command.lowercase() == "stop") {

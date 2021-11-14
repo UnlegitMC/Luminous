@@ -4,7 +4,7 @@ package me.liuli.luminous.agent.hook.impl
  * a container for method hooks
  */
 abstract class HookFunction(val targetClass: Class<*>) {
-    private val hookedMethods = mutableListOf<HookMethod>()
+    val hookedMethods = mutableListOf<HookMethod>()
 
     init {
         this.javaClass.declaredMethods.forEach { method ->

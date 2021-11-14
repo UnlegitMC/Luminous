@@ -47,8 +47,6 @@ class SlowDownEvent(var strafe: Float, var forward: Float) : Event()
 //}
 
 class MoveEvent(var x: Double, var y: Double, var z: Double) : EventCancellable() {
-    var isSafeWalk = false
-
     fun zero() {
         x = 0.0
         y = 0.0

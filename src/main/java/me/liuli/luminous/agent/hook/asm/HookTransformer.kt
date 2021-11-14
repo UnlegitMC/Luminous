@@ -25,8 +25,6 @@ class HookTransformer : ClassFileTransformer {
         val cv = HookClassVisitor(cw, function)
         cr.accept(cv, ClassReader.EXPAND_FRAMES)
 
-        File(Luminous.cacheDir, "${clazz.name}.class").writeBytes(cw.toByteArray())
-
         return cw.toByteArray()
     }
 }

@@ -22,6 +22,9 @@ object Luminous {
     var isAgent = true
         private set
 
+    var listeningConsole = false
+    var consoleMessage = ""
+
     init {
         jarFileAt = try {
             File(this.javaClass.protectionDomain.codeSource.location.toURI())

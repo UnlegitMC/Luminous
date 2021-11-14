@@ -18,9 +18,6 @@ object Loader {
     }
     val messageThread = MessageThread()
 
-    var listeningConsole = false
-    var consoleMessage = ""
-
     /**
      * called from [Luminous.main]
      */
@@ -31,14 +28,14 @@ object Loader {
         val vm = if (System.getProperty("luminous.targetjvm") != null) {
             AttachUtils.getJvmById(System.getProperty("luminous.targetjvm"))
         } else if(System.getProperty("luminous.useconsole") != null) {
-            listeningConsole = true
-            consoleMessage = ""
+            Luminous.listeningConsole = true
+            Luminous.consoleMessage = ""
             logWarn("Input target JVM process ID to attach...")
             VirtualMachine.list().forEach { logInfo("${it.id()} - ${it.displayName().split(" ")[0]}") }
-            while (consoleMessage.isEmpty()) {
-                Thread.sleep(500)
+            while (Luminous.consoleMessage.isEmpty()) {
+                Thread.sleep(300)
             }
-            AttachUtils.getJvmById(consoleMessage)
+            AttachUtils.getJvmById(Luminous.consoleMessage)
         } else {
             selectJvm()
         }

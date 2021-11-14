@@ -1,4 +1,4 @@
-package me.liuli.luminous.hooks.entity
+package me.liuli.luminous.hooks.other
 
 import me.liuli.luminous.agent.hook.impl.Hook
 import me.liuli.luminous.agent.hook.impl.HookFunction

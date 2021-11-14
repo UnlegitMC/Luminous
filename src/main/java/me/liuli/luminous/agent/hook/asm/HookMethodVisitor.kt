@@ -29,19 +29,16 @@ class HookMethodVisitor(val hookMethodList: List<HookMethod>, methodVisitor: Met
      */
     private fun injectCall(hookMethod: HookMethod) {
         // inject simple hook to pass the parameters to HookManager
-        mv.visitLdcInsn(hookMethod.hookFunction.targetClass.name)
-        mv.visitLdcInsn(hookMethod.targetMethodName)
-        mv.visitLdcInsn(hookMethod.targetMethodSign)
-        mv.visitLdcInsn(hookMethod.method.name)
-        mv.visitLdcInsn(hookMethod.method.signature)
+        mv.visitLdcInsn("${hookMethod.hookFunction.javaClass.name}/${hookMethod.method.name}!${hookMethod.method.signature}")
+        var i = 0
         if(Modifier.isStatic(hookMethod.targetMethod.modifiers)) {
             mv.visitInsn(ACONST_NULL) // pass null for static method
         } else {
             mv.visitVarInsn(ALOAD, 0) // pass the instance for dynamic method
+            i++
         }
         ByteCodeUtils.writeInsnNum(mv, hookMethod.targetMethod.parameters.size)
         mv.visitTypeInsn(ANEWARRAY, "java/lang/Object")
-        var i = 1
         hookMethod.targetMethod.parameters.forEachIndexed { index, parameter ->
             mv.visitInsn(DUP)
             ByteCodeUtils.writeInsnNum(mv, index)
@@ -68,7 +65,7 @@ class HookMethodVisitor(val hookMethodList: List<HookMethod>, methodVisitor: Met
             i++
             mv.visitInsn(AASTORE)
         }
-        mv.visitMethodInsn(INVOKESTATIC, "me/liuli/luminous/agent/hook/HookManager", "invokeHookMethod", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;[Ljava/lang/Object;)V")
+        mv.visitMethodInsn(INVOKESTATIC, "me/liuli/luminous/agent/hook/HookManager", "invokeHookMethod", "(Ljava/lang/String;Ljava/lang/Object;[Ljava/lang/Object;)V")
         // inject the ifeq return check if returnable is true
         if(hookMethod.info.returnable) {
             val label=Label()
