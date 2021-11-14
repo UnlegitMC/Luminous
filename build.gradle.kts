@@ -9,6 +9,7 @@ version = "1.0.0"
 
 val include: Configuration by configurations.creating
 val detekt_version = "1.18.1"
+val wrapDir = File(project.projectDir, "src/main/kotlin/wrapped")
 
 configurations {
     implementation.extendsFrom(include)
@@ -69,8 +70,6 @@ tasks.register("genWrapper") {
         }
     }
     doLast {
-        val wrapDir = File(project.projectDir, "src/main/kotlin/wrapped")
-        if (wrapDir.exists()) wrapDir.deleteRecursively()
         wrapMap.forEach { (dir, wc) ->
             val file = File(wrapDir, "$dir.kt")
             if(!file.parentFile.exists()) file.parentFile.mkdirs()
@@ -78,6 +77,15 @@ tasks.register("genWrapper") {
         }
     }
 }
+
+tasks.register("cleanWrapper") {
+    doFirst {
+        if (wrapDir.exists()) wrapDir.deleteRecursively()
+    }
+}
+
+tasks.named("genWrapper").get().dependsOn(tasks.named("cleanWrapper"))
+
 val wrapMap = mutableMapOf<String, WrappedClass>()
 
 class WrappedField(val modifier: Int, val name: String, val type: String) {

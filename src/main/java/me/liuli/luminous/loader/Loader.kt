@@ -7,6 +7,7 @@ import me.liuli.luminous.loader.connect.MessageThread
 import me.liuli.luminous.loader.console.Console
 import me.liuli.luminous.utils.jvm.AttachUtils
 import me.liuli.luminous.utils.misc.logError
+import me.liuli.luminous.utils.misc.logInfo
 import me.liuli.luminous.utils.misc.logWarn
 import javax.swing.*
 import kotlin.system.exitProcess
@@ -17,23 +18,36 @@ object Loader {
     }
     val messageThread = MessageThread()
 
+    var listeningConsole = false
+    var consoleMessage = ""
+
     /**
      * called from [Luminous.main]
      */
     fun main() {
+        messageThread.start()
+        consoleThread.start()
+
         val vm = if (System.getProperty("luminous.targetjvm") != null) {
             AttachUtils.getJvmById(System.getProperty("luminous.targetjvm"))
+        } else if(System.getProperty("luminous.useconsole") != null) {
+            listeningConsole = true
+            consoleMessage = ""
+            logWarn("Input target JVM process ID to attach...")
+            VirtualMachine.list().forEach { logInfo("${it.id()} - ${it.displayName().split(" ")[0]}") }
+            while (consoleMessage.isEmpty()) {
+                Thread.sleep(500)
+            }
+            AttachUtils.getJvmById(consoleMessage)
         } else {
             selectJvm()
         }
 
         if (vm == null) {
             logError("Action cancelled by user or Target JVM not found.")
+            Luminous.shutdown()
             return
         }
-
-        messageThread.start()
-        consoleThread.start()
 
         Thread {
             AttachUtils.attachJarIntoVm(vm, Luminous.jarFileAt)
