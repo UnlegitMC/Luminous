@@ -2,7 +2,10 @@ package me.liuli.luminous.loader.connect
 
 import com.beust.klaxon.Klaxon
 import me.liuli.luminous.Luminous
+import me.liuli.luminous.features.command.CommandManager
+import me.liuli.luminous.loader.connect.messages.Completions
 import me.liuli.luminous.loader.connect.messages.LogMessage
+import me.liuli.luminous.loader.console.ConsoleCompleter
 import me.liuli.luminous.utils.misc.LogUtils
 import java.io.File
 import java.net.DatagramPacket
@@ -31,8 +34,8 @@ class MessageThread : Thread() {
             val packet = DatagramPacket(buf, buf.size)
             socket.receive(packet)
             val packetStr = packet.data.toString(StandardCharsets.UTF_8)
-            try {
-                nextSize = if(nextSize == -1) {
+            nextSize = try {
+                if(nextSize == -1) {
                     packetStr.split("|")[0].toInt()
                 } else {
                     parse(packetStr)
@@ -41,6 +44,7 @@ class MessageThread : Thread() {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                -1
             }
         }
     }
@@ -49,10 +53,14 @@ class MessageThread : Thread() {
         val message = Klaxon().parse<Message>(msg) ?: return
 
         when(message.type) {
-            "cmd" -> println("COMMAND EXEC $message")
-//            "complete" ->
+            "cmd" -> CommandManager.handleCommand(message.content)
+            "cmd-complete-req" -> send(Message(Completions(CommandManager.getCompletions(message.content))))
+            "cmd-complete-resp" -> {
+                val completions = Klaxon().parse<Completions>(message.content) ?: return
+                ConsoleCompleter.completionsPending = completions.result
+            }
             "log" -> {
-                val log = Klaxon().parse<LogMessage>(message.data) ?: return
+                val log = Klaxon().parse<LogMessage>(message.content) ?: return
                 LogUtils.log(log.log4jLevel, log.message)
             }
         }

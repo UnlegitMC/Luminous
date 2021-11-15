@@ -3,9 +3,7 @@ package me.liuli.luminous.utils.misc
 import me.liuli.luminous.utils.misc.LogUtils.log
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.core.Logger
-import java.text.SimpleDateFormat
 
-private val DATE_FORMAT = SimpleDateFormat("HH:mm:ss")
 lateinit var logger: Logger
 
 fun logInfo(message: String) {

@@ -33,7 +33,7 @@ object Loader {
             logWarn("Input target JVM process ID to attach...")
             VirtualMachine.list().forEach { logInfo("${it.id()} - ${it.displayName().split(" ")[0]}") }
             while (Luminous.consoleMessage.isEmpty()) {
-                Thread.sleep(300)
+                Thread.sleep(100)
             }
             AttachUtils.getJvmById(Luminous.consoleMessage)
         } else {
@@ -42,7 +42,7 @@ object Loader {
 
         if (vm == null) {
             logError("Action cancelled by user or Target JVM not found.")
-            Luminous.shutdown()
+            shutdownLoader()
             return
         }
 

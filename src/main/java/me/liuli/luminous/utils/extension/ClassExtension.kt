@@ -30,10 +30,10 @@ fun Class<*>.getObfMethodAccessable(name: String, signature: String)
 fun Class<*>.getObfFieldValue(name: String, instance: Any? = null)
     = getObfFieldAccessable(name).get(instance)
 
-fun Class<*>.setObfFieldValue(name: String, instance: Any? = null, value: Any)
+fun Class<*>.setObfFieldValue(name: String, value: Any, instance: Any? = null)
     = getObfFieldAccessable(name).set(instance, value)
 
-fun Class<*>.invokeObfMethod(name: String, signature: String, instance: Any? = null, vararg args: Any)
+fun Class<*>.invokeObfMethod(name: String, signature: String, vararg args: Any, instance: Any? = null)
     = getObfMethodAccessable(name, signature).invoke(instance, *args)
 
 // https://stackoverflow.com/questions/45072268/how-can-i-get-the-signature-field-of-java-reflection-method-object

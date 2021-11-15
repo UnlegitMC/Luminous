@@ -6,7 +6,6 @@ import me.liuli.luminous.agent.hook.impl.HookFunction
 import me.liuli.luminous.agent.hook.impl.HookMethod
 import me.liuli.luminous.agent.hook.impl.HookReturnInfo
 import me.liuli.luminous.utils.extension.signature
-import me.liuli.luminous.utils.jvm.AccessUtils
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logWarn
 import java.lang.instrument.Instrumentation

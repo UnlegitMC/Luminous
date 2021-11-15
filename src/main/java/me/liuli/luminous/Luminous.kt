@@ -12,6 +12,7 @@ import java.net.URLClassLoader
 
 object Luminous {
     const val NAME = "Luminous"
+    const val NAME_WITH_COLOR = "§dL§fuminous"
     const val VERSION = "1.0.0"
     const val RESOURCE = "https://lumires.getfdp.today"
     const val TITLE = "${Luminous.NAME} v${Luminous.VERSION}"
@@ -58,7 +59,7 @@ object Luminous {
     @JvmStatic
     fun main(args: Array<String>) {
         this.isAgent = false
-        logInfo("Welcome to $NAME v$VERSION")
+        logInfo("Welcome to $NAME_WITH_COLOR§r v$VERSION")
 
         logInfo("Find self jar file at: $jarFileAt")
 
