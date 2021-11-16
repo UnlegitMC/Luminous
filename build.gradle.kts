@@ -1,3 +1,8 @@
+import java.util.jar.JarFile
+import java.io.FileOutputStream
+import java.util.jar.JarOutputStream
+import java.util.jar.JarEntry
+
 plugins {
     kotlin("jvm") version "1.5.31"
     java
@@ -28,6 +33,27 @@ dependencies {
     implementation(files(org.gradle.internal.jvm.Jvm.current().toolsJar)) // this dependency will be loaded dynamically
 }
 
+tasks.register("commentJar") {
+    doFirst {
+        val jos = JarOutputStream(FileOutputStream(File(project.buildDir, "libs/${project.name}-${project.version}-COMMENT.jar")))
+        JarFile(File(project.buildDir, "libs/${project.name}-${project.version}.jar")).use { jar ->
+            jar.entries().asSequence().forEach {
+                if (it.name.endsWith(".class")) {
+                    // add a slash to the end of the entry name to make bytecode modifier think it is a directory
+                    jos.putNextEntry(JarEntry("${it.name}/"))
+                } else {
+                    jos.putNextEntry(it)
+                }
+                jos.write(jar.getInputStream(it).readBytes())
+                jos.closeEntry()
+            }
+            jar.close()
+        }
+        jos.setComment("me.liuli.luminous.agent.JavaInjectorAgent") // for JavaInjector to locate the main class
+        jos.close()
+    }
+}
+
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     archiveClassifier.set("")
     configurations = mutableListOf(include)
@@ -35,6 +61,7 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
 
     exclude("**/Log4j2Plugins.dat")
     exclude("**/module-info.class")
+    exclude("**/package-info.class")
 
     manifest {
         attributes["Main-Class"] = "me.liuli.luminous.Luminous"
@@ -42,6 +69,8 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
         attributes["Can-Redefine-Classes"] = true
         attributes["Can-Retransform-Classes"] = true
     }
+
+//    finalizedBy(tasks.named("commentJar"))
 }
 
 tasks {
