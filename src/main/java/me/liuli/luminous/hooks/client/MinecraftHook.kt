@@ -8,6 +8,7 @@ import me.liuli.luminous.event.EventManager
 import me.liuli.luminous.event.KeyEvent
 import me.liuli.luminous.event.TickEvent
 import me.liuli.luminous.event.WorldEvent
+import me.liuli.luminous.hooks.AdditionalEventDispatcher
 import me.liuli.luminous.utils.jvm.AccessUtils
 import org.lwjgl.input.Keyboard
 import wrapped.net.minecraft.client.multiplayer.WorldClient
@@ -15,9 +16,7 @@ import wrapped.net.minecraft.client.multiplayer.WorldClient
 class MinecraftHook : HookFunction(AccessUtils.getObfClassByName("net.minecraft.client.Minecraft")) {
     @Hook(target = "runTick!()V", type = HookType.METHOD_ENTER)
     fun tick() {
-        if(Keyboard.getEventKeyState()) {
-            EventManager.callEvent(KeyEvent(if (Keyboard.getEventKey() == 0) { Keyboard.getEventCharacter().code + 256 } else { Keyboard.getEventKey() }))
-        }
+        AdditionalEventDispatcher.checkKey()
         EventManager.callEvent(TickEvent())
     }
 

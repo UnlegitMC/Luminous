@@ -25,6 +25,14 @@ object Loader {
         messageThread.start()
         consoleThread.start()
 
+        if(System.getProperty("luminous.noinject") != null) {
+            logInfo("luminous.noinject is set, will not inject at default")
+        } else {
+            doInject()
+        }
+    }
+
+    fun doInject() {
         val vm = if (System.getProperty("luminous.targetjvm") != null) {
             AttachUtils.getJvmById(System.getProperty("luminous.targetjvm"))
         } else if(System.getProperty("luminous.useconsole") != null) {
@@ -42,7 +50,6 @@ object Loader {
 
         if (vm == null) {
             logError("Action cancelled by user or Target JVM not found.")
-            shutdownLoader()
             return
         }
 

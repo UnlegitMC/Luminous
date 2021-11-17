@@ -1,6 +1,10 @@
 package me.liuli.luminous
 
+import com.beust.klaxon.Klaxon
 import me.liuli.luminous.agent.Agent
+import me.liuli.luminous.features.command.CommandManager
+import me.liuli.luminous.features.config.ConfigManager
+import me.liuli.luminous.features.ui.hud.HudManager
 import me.liuli.luminous.loader.Loader
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logInfo
@@ -21,7 +25,6 @@ object Luminous {
     val configDir = File(System.getProperty("user.home"), ".config/${NAME}")
     val jarFileAt: File
     var isAgent = true
-        private set
 
     var listeningConsole = false
     var consoleMessage = ""
@@ -43,6 +46,13 @@ object Luminous {
      */
     fun launch() {
         logInfo("Loading client...")
+
+        // initialize kotlin objects
+        CommandManager
+        ConfigManager
+        CommandManager
+
+        HudManager
     }
 
     /**

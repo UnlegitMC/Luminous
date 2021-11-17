@@ -26,5 +26,7 @@ object ConsoleCompleter : Completer {
         completionsPending!!.forEach {
             candidates.add(Candidate(it))
         }
+        candidates.add(Candidate("stop"))
+        candidates.add(Candidate("inject"))
     }
 }

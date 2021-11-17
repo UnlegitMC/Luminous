@@ -15,7 +15,6 @@ object Agent {
         private set
 
     var forgeEnv = false
-        private set
 
     val messageThread = MessageThread()
 

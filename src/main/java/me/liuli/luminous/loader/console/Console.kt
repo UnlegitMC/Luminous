@@ -18,6 +18,9 @@ class Console : SimpleTerminalConsole() {
         if(command.lowercase() == "stop") {
             Loader.shutdownLoader()
             return
+        } else if(command.lowercase() == "inject") {
+            Loader.doInject()
+            return
         }
         Loader.messageThread.send(Message("cmd", command))
     }
