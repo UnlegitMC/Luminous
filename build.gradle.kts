@@ -3,7 +3,7 @@ import java.io.FileOutputStream
 import java.util.jar.JarOutputStream
 
 plugins {
-    kotlin("jvm") version "1.5.31"
+    kotlin("jvm") version "1.6.0"
     java
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }

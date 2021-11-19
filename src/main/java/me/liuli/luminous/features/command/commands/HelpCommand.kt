@@ -7,7 +7,7 @@ import me.liuli.luminous.utils.misc.logInfo
 import me.liuli.luminous.utils.misc.logWarn
 import kotlin.math.ceil
 
-class HelpCommands : Command("help", "List all commands") {
+class HelpCommand : Command("help", "List all commands") {
     override fun exec(args: Array<String>) {
         val page = if (args.isNotEmpty()) {
             try {

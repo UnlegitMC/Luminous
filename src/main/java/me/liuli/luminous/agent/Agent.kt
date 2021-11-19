@@ -59,12 +59,7 @@ object Agent {
         AccessUtils.resolvePackage("me.liuli.luminous.hooks", HookFunction::class.java)
             .forEach {
                 try {
-                    HookManager.registerHookFunction(it.newInstance())
-                } catch (e: IllegalAccessException) {
-                    // this module looks like a kotlin object
-                    AccessUtils.getKotlinObjectInstance(it)?.let { function ->
-                        HookManager.registerHookFunction(function)
-                    }
+                    HookManager.registerHookFunction(AccessUtils.getInstance(it))
                 } catch (e: Throwable) {
                     logError("Failed to load hook: ${it.name} (${e.javaClass.name}: ${e.message})")
                 }

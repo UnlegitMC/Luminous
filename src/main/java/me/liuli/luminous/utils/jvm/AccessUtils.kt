@@ -226,6 +226,17 @@ object AccessUtils {
         return list
     }
 
+    fun <T : Any> getInstance(clazz: Class<T>): T {
+        return try {
+            clazz.newInstance()
+        } catch (e: IllegalAccessException) {
+            // this module looks like a kotlin object
+            getKotlinObjectInstance(clazz) ?: throw IllegalAccessException("Cannot get instance of $clazz")
+        } catch (e: Throwable) {
+            throw IllegalAccessException("Cannot get instance of $clazz")
+        }
+    }
+
     fun <T : Any> getKotlinObjectInstance(clazz: Class<T>): T? {
         return try {
             clazz.getDeclaredField("INSTANCE").get(null) as T // kotlin object INSTANCE field is nonnull

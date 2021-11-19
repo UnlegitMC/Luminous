@@ -11,8 +11,8 @@ object CommandManager {
             .forEach(this::registerCommand)
     }
 
-    fun registerCommand(clazz: Class<out Command>) {
-        registerCommand(clazz.newInstance())
+    private fun registerCommand(clazz: Class<out Command>) {
+        registerCommand(AccessUtils.getInstance(clazz))
     }
 
     fun registerCommand(command: Command) {

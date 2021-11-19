@@ -1,9 +1,9 @@
 package me.liuli.luminous
 
-import com.beust.klaxon.Klaxon
 import me.liuli.luminous.agent.Agent
 import me.liuli.luminous.features.command.CommandManager
 import me.liuli.luminous.features.config.ConfigManager
+import me.liuli.luminous.features.module.ModuleManager
 import me.liuli.luminous.features.ui.hud.HudManager
 import me.liuli.luminous.loader.Loader
 import me.liuli.luminous.utils.misc.logError
@@ -19,10 +19,10 @@ object Luminous {
     const val NAME_WITH_COLOR = "§dL§fuminous"
     const val VERSION = "1.0.0"
     const val RESOURCE = "https://lumires.getfdp.today"
-    const val TITLE = "${Luminous.NAME} v${Luminous.VERSION}"
+    const val TITLE = "$NAME v$VERSION"
 
     val cacheDir = File(System.getProperty("user.home"), ".cache/${NAME}")
-    val configDir = File(System.getProperty("user.home"), ".config/${NAME}")
+    val dataDir = File(System.getProperty("user.home"), ".config/${NAME}")
     val jarFileAt: File
     var isAgent = true
 
@@ -38,7 +38,7 @@ object Luminous {
         }
 
         if(cacheDir.exists().not()) cacheDir.mkdirs()
-        if(configDir.exists().not()) configDir.mkdirs()
+        if(dataDir.exists().not()) dataDir.mkdirs()
     }
 
     /**
@@ -48,9 +48,9 @@ object Luminous {
         logInfo("Loading client...")
 
         // initialize kotlin objects
-        CommandManager
         ConfigManager
         CommandManager
+        ModuleManager
 
         HudManager
     }
@@ -60,6 +60,8 @@ object Luminous {
      */
     fun shutdown() {
         logInfo("Shutting down $NAME...")
+
+        ConfigManager.writeAll()
     }
 
     /**
