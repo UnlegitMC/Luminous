@@ -13,7 +13,7 @@ object ModuleManager: Listener {
     }
 
     operator fun get(name: String): Module? {
-        return modules.find { it.name == name }
+        return modules.find { it.name.equals(name, true) }
     }
 
     fun <T : Module> get(clazz: Class<T>): T? {

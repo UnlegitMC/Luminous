@@ -3,6 +3,7 @@ package me.liuli.luminous.features.command.commands
 import me.liuli.luminous.features.command.Command
 import me.liuli.luminous.features.module.ModuleManager
 import me.liuli.luminous.utils.misc.logError
+import me.liuli.luminous.utils.misc.logInfo
 import org.lwjgl.input.Keyboard
 
 class BindCommand : Command("bind", "Change the trigger key of a module") {
@@ -24,6 +25,7 @@ class BindCommand : Command("bind", "Change the trigger key of a module") {
         }
 
         module.keyBind = key
+        logInfo("Set ${module.name}'s key to $${Keyboard.getKeyName(module.keyBind)}")
     }
 
     override fun getCompletions(args: Array<String>): List<String> {

@@ -8,7 +8,7 @@ import me.liuli.luminous.event.EventManager
 import me.liuli.luminous.event.JumpEvent
 import me.liuli.luminous.utils.jvm.AccessUtils
 
-class EntityLivingBaseHook : HookFunction(AccessUtils.getObfClassByName("net.minecraft.entity.EntityLivingBase")) {
+class EntityLivingBaseHook : HookFunction(AccessUtils.getObfClass("net.minecraft.entity.EntityLivingBase")) {
     @Hook(target = "jump!()V", type = HookType.METHOD_ENTER, returnable = true)
     fun jump(returnInfo: HookReturnInfo) {
         val event = JumpEvent()

@@ -11,6 +11,7 @@ import org.apache.logging.log4j.core.config.plugins.util.PluginRegistry
 import org.apache.logging.log4j.core.config.plugins.util.ResolverUtil
 import org.lwjgl.opengl.Display
 import java.io.File
+import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.nio.charset.StandardCharsets
 import javax.swing.*
@@ -174,13 +175,28 @@ object AccessUtils {
     fun getClassByName(name: String)
             = if(Agent.forgeEnv) { Class.forName(name) } else { Agent.instrumentation.allLoadedClasses.find { it.name == name } ?: throw ClassNotFoundException(name) }
 
-    fun getObfClassByName(name: String)
+    // use cache to make process faster
+    private val classCache = mutableMapOf<String, Class<*>>()
+    private val fieldCache = mutableMapOf<String, Field>()
+    private val methodCache = mutableMapOf<String, Method>()
+
+
+    fun getObfClass(name: String)
+            = classCache[name] ?: getObfClassNoCache(name).also { classCache[name] = it }
+
+    fun getObfClassNoCache(name: String)
             = getClassByName(classOverrideMap[name] ?: name)
 
-    fun getObfFieldByName(clazz: Class<*>, name: String)
+    fun getObfField(clazz: Class<*>, name: String)
+            = fieldCache[clazz.name + "!" + name] ?: getObfFieldNoCache(clazz, name).also { it.isAccessible = true ; fieldCache[clazz.name + "!" + name] = it }
+
+    fun getObfFieldNoCache(clazz: Class<*>, name: String)
             = clazz.getDeclaredField(fieldOverrideMap[clazz.name + "!" + name]?.split("!")?.get(1) ?: name)
 
-    fun getObfMethodByName(clazz: Class<*>, name: String, signature: String): Method {
+    fun getObfMethod(clazz: Class<*>, name: String, signature: String)
+            = methodCache[clazz.name + "!" + name + "!" + signature] ?: getObfMethodNoCache(clazz, name, signature).also { it.isAccessible = true ; methodCache[clazz.name + "!" + name + "!" + signature] = it }
+
+    fun getObfMethodNoCache(clazz: Class<*>, name: String, signature: String): Method {
         val method = methodOverrideMap[clazz.name + "!" + name + "!" + signature]
             ?: return (clazz.getMethodsByName(name).find { it.signature == signature } ?: throw NoSuchMethodException(name))
 

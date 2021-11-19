@@ -8,7 +8,7 @@ import me.liuli.luminous.event.*
 import me.liuli.luminous.utils.jvm.AccessUtils
 import wrapped.net.minecraft.client.entity.EntityPlayerSP
 
-class EntityPlayerSPHook : HookFunction(AccessUtils.getObfClassByName("net.minecraft.client.entity.EntityPlayerSP")) {
+class EntityPlayerSPHook : HookFunction(AccessUtils.getObfClass("net.minecraft.client.entity.EntityPlayerSP")) {
     companion object {
         var flag = false
     }

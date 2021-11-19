@@ -9,7 +9,7 @@ import me.liuli.luminous.event.SlowDownEvent
 import me.liuli.luminous.utils.jvm.AccessUtils
 import wrapped.net.minecraft.client.entity.EntityPlayerSP
 
-class EntityPlayerHook : HookFunction(AccessUtils.getObfClassByName("net.minecraft.entity.player.EntityPlayer")) {
+class EntityPlayerHook : HookFunction(AccessUtils.getObfClass("net.minecraft.entity.player.EntityPlayer")) {
 
     @Hook(target = "isUsingItem!()Z", type = HookType.METHOD_ENTER, getInstance = true, returnable = true)
     fun onUpdateWalkingPlayerEnter(instance_: Any, returnInfo: HookReturnInfo) {

@@ -10,8 +10,8 @@ import me.liuli.luminous.event.StrafeEvent
 import me.liuli.luminous.utils.jvm.AccessUtils
 import wrapped.net.minecraft.client.entity.EntityPlayerSP
 
-class EntityHook : HookFunction(AccessUtils.getObfClassByName("net.minecraft.entity.Entity")) {
-    private val entityPlayerSPClass = AccessUtils.getObfClassByName("net.minecraft.client.entity.EntityPlayerSP")
+class EntityHook : HookFunction(AccessUtils.getObfClass("net.minecraft.entity.Entity")) {
+    private val entityPlayerSPClass = AccessUtils.getObfClass("net.minecraft.client.entity.EntityPlayerSP")
     private var thisTimeAllow = false
 
     @Hook(target = "moveFlying!(FFF)V", type = HookType.METHOD_ENTER, getInstance = true, returnable = true, getParameters = true)

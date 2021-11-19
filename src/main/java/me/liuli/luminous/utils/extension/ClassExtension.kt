@@ -16,25 +16,19 @@ fun Class<*>.getFieldByName(name: String)
         = this.getFieldsByName(name).firstOrNull() ?: throw NoSuchFieldException(name)
 
 fun Class<*>.getObfField(name: String)
-    = AccessUtils.getObfFieldByName(this, name)
+    = AccessUtils.getObfField(this, name)
 
 fun Class<*>.getObfMethod(name: String, signature: String)
-    = AccessUtils.getObfMethodByName(this, name, signature)
-
-fun Class<*>.getObfFieldAccessable(name: String)
-    = AccessUtils.getObfFieldByName(this, name).also { it.isAccessible = true }
-
-fun Class<*>.getObfMethodAccessable(name: String, signature: String)
-    = AccessUtils.getObfMethodByName(this, name, signature).also { it.isAccessible = true }
+    = AccessUtils.getObfMethod(this, name, signature)
 
 fun Class<*>.getObfFieldValue(name: String, instance: Any? = null)
-    = getObfFieldAccessable(name).get(instance)
+    = getObfField(name).get(instance)
 
 fun Class<*>.setObfFieldValue(name: String, value: Any, instance: Any? = null)
-    = getObfFieldAccessable(name).set(instance, value)
+    = getObfField(name).set(instance, value)
 
 fun Class<*>.invokeObfMethod(name: String, signature: String, vararg args: Any, instance: Any? = null)
-    = getObfMethodAccessable(name, signature).invoke(instance, *args)
+    = getObfMethod(name, signature).invoke(instance, *args)
 
 // https://stackoverflow.com/questions/45072268/how-can-i-get-the-signature-field-of-java-reflection-method-object
 val Method.signature: String

@@ -13,7 +13,7 @@ class HookMethod(val hookFunction: HookFunction, val method: Method, val info: H
             ?: (hookFunction.targetClass.name + "!" + info.target)).split("!")
         targetMethodName = deobf[1]
         targetMethodSign = deobf[2]
-        targetMethod = AccessUtils.getObfMethodByName(hookFunction.targetClass, targetMethodName, targetMethodSign)
+        targetMethod = AccessUtils.getObfMethod(hookFunction.targetClass, targetMethodName, targetMethodSign)
     }
 
     /**

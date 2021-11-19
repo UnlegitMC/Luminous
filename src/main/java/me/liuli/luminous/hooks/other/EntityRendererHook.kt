@@ -7,7 +7,7 @@ import me.liuli.luminous.event.EventManager
 import me.liuli.luminous.event.Render3DEvent
 import me.liuli.luminous.utils.jvm.AccessUtils
 
-class EntityRendererHook : HookFunction(AccessUtils.getObfClassByName("net.minecraft.client.renderer.EntityRenderer")) {
+class EntityRendererHook : HookFunction(AccessUtils.getObfClass("net.minecraft.client.renderer.EntityRenderer")) {
     @Hook(target = "renderWorldPass!(IFJ)V", type = HookType.METHOD_EXIT, getParameters = true)
     fun renderWorldPass(pass: Int, partialTicks: Float, finishTimeNano: Long) {
         EventManager.callEvent(Render3DEvent(partialTicks))

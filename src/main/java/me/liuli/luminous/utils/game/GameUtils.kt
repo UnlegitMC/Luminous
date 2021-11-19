@@ -8,8 +8,10 @@ import me.liuli.luminous.utils.jvm.AccessUtils
 import me.liuli.luminous.utils.misc.logWarn
 import wrapped.net.minecraft.client.Minecraft
 
+val mc = Minecraft.theMinecraft!!
+
 object GameUtils {
-    private val iChatComponent = AccessUtils.getObfClassByName("net.minecraft.util.IChatComponent\$Serializer")
+    private val iChatComponent = AccessUtils.getObfClass("net.minecraft.util.IChatComponent\$Serializer")
 
     fun displayAlert(message: String) {
         logWarn("[CHAT] $message")

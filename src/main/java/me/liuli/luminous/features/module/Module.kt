@@ -20,7 +20,7 @@ open class Module(
        set(state) {
            if (field == state) return
 
-           if (!canToggle) {
+           if (canToggle) {
                field = state
            }
 
