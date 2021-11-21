@@ -3,7 +3,10 @@ package me.liuli.luminous.features.config
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Klaxon
 import me.liuli.luminous.Luminous
-import me.liuli.luminous.event.*
+import me.liuli.luminous.event.EventHandler
+import me.liuli.luminous.event.EventManager
+import me.liuli.luminous.event.Listener
+import me.liuli.luminous.event.TickEvent
 import me.liuli.luminous.utils.jvm.AccessUtils
 import me.liuli.luminous.utils.misc.logInfo
 import me.liuli.luminous.utils.timing.TheTimer
@@ -100,7 +103,7 @@ object ConfigManager: Listener {
     }
 
     private fun writeConfigJson(file: File, json: JsonObject) {
-        file.writeText(json.toJsonString(true))
+        file.writeText(json.toJsonString(true), UTF_8)
     }
 
     private var saveScheduled = false

@@ -4,24 +4,23 @@ import me.liuli.luminous.Luminous
 import me.liuli.luminous.agent.Agent
 import me.liuli.luminous.features.value.Value
 import me.liuli.luminous.utils.extension.getMethodsByName
-import me.liuli.luminous.utils.extension.invoke
 import me.liuli.luminous.utils.extension.signature
+import me.liuli.luminous.utils.game.SrgUtils
 import me.liuli.luminous.utils.misc.HttpUtils
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logInfo
+import me.liuli.luminous.utils.misc.logWarn
 import org.apache.logging.log4j.core.config.plugins.util.PluginRegistry
 import org.apache.logging.log4j.core.config.plugins.util.ResolverUtil
 import org.lwjgl.opengl.Display
+import java.io.BufferedWriter
 import java.io.File
-import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
-import java.nio.charset.StandardCharsets
 import javax.swing.*
 
 object AccessUtils {
     val SRG_URL = "${Luminous.RESOURCE}/srg"
-    val SRG2MCP_VERSION = "stable_22"
     val SUPPORT_VERSION_LIST =
         arrayOf("1.7.10",
             "1.8", "1.8.8", "1.8.9",
@@ -29,6 +28,23 @@ object AccessUtils {
             "1.10", "1.10.2",
             "1.11", "1.11.1", "1.11.2",
             "1.12", "1.12.1", "1.12.2")
+    val SRG_STABLE_MAP = mutableMapOf<String, String>().also {
+        it["1.7.10"] = "12"
+        it["1.8"] = "18"
+        it["1.8.8"] = "20"
+        it["1.8.9"] = "22"
+        it["1.9"] = "24"
+        it["1.9.2"] = "24"
+        it["1.9.4"] = "26"
+        it["1.10"] = "26"
+        it["1.10.2"] = "29"
+        it["1.11"] = "32"
+        it["1.11.1"] = "32"
+        it["1.11.2"] = "32"
+        it["1.12"] = "39"
+        it["1.12.1"] = "39"
+        it["1.12.2"] = "39"
+    }
 
     val srgCacheDir = File(Luminous.cacheDir, "srg")
 
@@ -91,17 +107,33 @@ object AccessUtils {
     fun init(version: String) {
         logInfo("Loading srg map for Minecraft $version with $currentEnv env")
 
+        // all env depend on the notch map
+        val notchMapFile = File(srgCacheDir, "$version.srg")
+        HttpUtils.downloadIfNotExists("$SRG_URL/notchsrg/$version.srg", File(srgCacheDir, "$version.srg"))
+
         // download notch-srg map if in notch env
         if(currentEnv == MinecraftEnv.NOTCH) {
-            val srgMapFile = File(srgCacheDir, "$version.srg")
-            HttpUtils.downloadIfNotExists("$SRG_URL/$version.srg", File(srgCacheDir, "$version.srg"))
-            phaseSrgMap(srgMapFile)
+            phaseSrgMap(notchMapFile)
         }
 
         // phase srg-mcp map after notch-srg map
         if(currentEnv != MinecraftEnv.MCP) {
-            val mcpMapFile = File(srgCacheDir, "$SRG2MCP_VERSION.srg")
-            HttpUtils.downloadIfNotExists("$SRG_URL/$SRG2MCP_VERSION.srg", mcpMapFile)
+            val mcpVersion = SRG_STABLE_MAP[version] ?: throw IllegalArgumentException("Unsupported version: $version")
+            val mcpMapFile = File(srgCacheDir, "stable_$mcpVersion.srg")
+            if(!mcpMapFile.exists()) {
+                logWarn("Downloading MCP$mcpVersion Fields Map...")
+                val fieldCsv = HttpUtils.get("$SRG_URL/mcp/${mcpVersion}_fields.csv").split("\n")
+                logWarn("Downloading MCP$mcpVersion Methods Map...")
+                val methodCsv = HttpUtils.get("$SRG_URL/mcp/${mcpVersion}_methods.csv").split("\n")
+                logWarn("Mixing MCP$mcpVersion CSV to SRG form...")
+                val writer = BufferedWriter(mcpMapFile.writer(Charsets.UTF_8))
+                SrgUtils.convertSrg(notchMapFile.readLines(Charsets.UTF_8), methodCsv, fieldCsv).forEach {
+                    writer.write(it)
+                    writer.newLine()
+                }
+                writer.flush()
+                writer.close()
+            }
             phaseSrgMap(mcpMapFile)
         }
 
@@ -134,7 +166,7 @@ object AccessUtils {
     }
 
     private fun phaseSrgMap(srgFile: File) {
-        srgFile.readLines(StandardCharsets.UTF_8).forEach {
+        srgFile.readLines(Charsets.UTF_8).forEach {
             val args = it.split(" ")
 
             when {

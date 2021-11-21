@@ -56,7 +56,7 @@ object HttpUtils {
     ): String {
         val connection = make(url, method, data, agent)
 
-        return connection.inputStream.reader().readText()
+        return connection.inputStream.reader(Charsets.UTF_8).readText()
     }
 
     fun requestStream(

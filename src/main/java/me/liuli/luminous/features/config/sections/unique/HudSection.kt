@@ -5,10 +5,8 @@ import com.beust.klaxon.JsonObject
 import me.liuli.luminous.features.config.ConfigSection
 import me.liuli.luminous.features.ui.hud.ElementSide
 import me.liuli.luminous.features.ui.hud.HudManager
-import me.liuli.luminous.features.value.Value
 import me.liuli.luminous.utils.jvm.AccessUtils
 import me.liuli.luminous.utils.misc.JsonUtils
-import me.liuli.luminous.utils.misc.logWarn
 
 class HudSection : ConfigSection("hud", true) {
     override fun load(json: JsonObject) {

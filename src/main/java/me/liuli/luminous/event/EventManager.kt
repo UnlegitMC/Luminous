@@ -1,7 +1,6 @@
 package me.liuli.luminous.event
 
 import me.liuli.luminous.utils.misc.logError
-import me.liuli.luminous.utils.misc.logInfo
 
 object EventManager {
     private val listeners = mutableMapOf<Class<*>, MutableList<ListenerMethod>>()

@@ -4,7 +4,6 @@ import me.liuli.luminous.event.*
 import me.liuli.luminous.utils.game.mc
 import me.liuli.luminous.utils.jvm.AccessUtils
 import me.liuli.luminous.utils.misc.logError
-import me.liuli.luminous.utils.misc.logInfo
 import org.lwjgl.opengl.GL11
 
 object HudManager: Listener {

@@ -2,7 +2,6 @@ package me.liuli.luminous.agent.jis
 
 import me.liuli.luminous.Luminous
 import me.liuli.luminous.agent.Agent
-import me.liuli.luminous.utils.jvm.AccessUtils
 import net.minecraftforge.common.MinecraftForge
 import javax.swing.JOptionPane
 
