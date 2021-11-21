@@ -9,7 +9,7 @@ import me.liuli.luminous.utils.game.mc
 import me.liuli.luminous.utils.jvm.AccessUtils
 import wrapped.net.minecraft.client.settings.GameSettings
 
-class InventoryMove : Module("InventoryMove", "Allows you to walk while opening the inventory.", ModuleCategory.MOVEMENT) {
+class InventoryMoveModule : Module("InventoryMove", "Allows you to walk while opening the inventory.", ModuleCategory.MOVEMENT) {
     private val guiChatClass = AccessUtils.getObfClass("net.minecraft.client.gui.GuiChat")
 
     @EventHandler

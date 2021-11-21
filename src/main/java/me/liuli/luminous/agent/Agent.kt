@@ -84,5 +84,6 @@ object Agent {
      * final initialization for the cheat
      */
     fun init() {
+        Luminous.launch()
     }
 }

@@ -1,6 +1,7 @@
 package me.liuli.luminous.features.command.commands
 
 import me.liuli.luminous.features.command.Command
+import me.liuli.luminous.features.config.ConfigManager
 import me.liuli.luminous.features.module.ModuleManager
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logInfo
@@ -25,6 +26,7 @@ class BindCommand : Command("bind", "Change the trigger key of a module") {
         }
 
         module.keyBind = key
+        ConfigManager.scheduleSave()
         logInfo("Set ${module.name}'s key to $${Keyboard.getKeyName(module.keyBind)}")
     }
 

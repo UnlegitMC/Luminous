@@ -2,7 +2,9 @@ package me.liuli.luminous.utils.jvm
 
 import me.liuli.luminous.Luminous
 import me.liuli.luminous.agent.Agent
+import me.liuli.luminous.features.value.Value
 import me.liuli.luminous.utils.extension.getMethodsByName
+import me.liuli.luminous.utils.extension.invoke
 import me.liuli.luminous.utils.extension.signature
 import me.liuli.luminous.utils.misc.HttpUtils
 import me.liuli.luminous.utils.misc.logError
@@ -11,6 +13,7 @@ import org.apache.logging.log4j.core.config.plugins.util.PluginRegistry
 import org.apache.logging.log4j.core.config.plugins.util.ResolverUtil
 import org.lwjgl.opengl.Display
 import java.io.File
+import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.nio.charset.StandardCharsets
@@ -43,6 +46,12 @@ object AccessUtils {
     val classOverrideMap = mutableMapOf<String, String>() // example: net.minecraft.client.Minecraft -> ave
     val fieldOverrideMap = mutableMapOf<String, String>() // example: net/minecraft/client/Minecraft/thePlayer -> (net/minecraft/client/Minecraft/field_71439_g ->) ave/h
     val methodOverrideMap = mutableMapOf<String, String>() // like fieldOverrideMap, but for methods
+
+    // use cache to make process faster
+    private val classCache = mutableMapOf<String, Class<*>>()
+    private val fieldCache = mutableMapOf<String, Field>()
+    private val methodCache = mutableMapOf<String, Method>()
+    private val valueCache = mutableMapOf<Class<*>, List<Value<*>>>()
 
     init {
         if(!srgCacheDir.exists())
@@ -175,12 +184,6 @@ object AccessUtils {
     fun getClassByName(name: String)
             = if(Agent.forgeEnv) { Class.forName(name) } else { Agent.instrumentation.allLoadedClasses.find { it.name == name } ?: throw ClassNotFoundException(name) }
 
-    // use cache to make process faster
-    private val classCache = mutableMapOf<String, Class<*>>()
-    private val fieldCache = mutableMapOf<String, Field>()
-    private val methodCache = mutableMapOf<String, Method>()
-
-
     fun getObfClass(name: String)
             = classCache[name] ?: getObfClassNoCache(name).also { classCache[name] = it }
 
@@ -242,24 +245,67 @@ object AccessUtils {
         return list
     }
 
-    fun <T : Any> getInstance(clazz: Class<T>): T {
+    fun <T : Any> getInstanceOrNull(clazz: Class<T>): T? {
         return try {
             clazz.newInstance()
         } catch (e: IllegalAccessException) {
             // this module looks like a kotlin object
-            getKotlinObjectInstance(clazz) ?: throw IllegalAccessException("Cannot get instance of $clazz")
+            getKotlinObjectInstance(clazz)
         } catch (e: Throwable) {
-            throw IllegalAccessException("Cannot get instance of $clazz")
+            e.printStackTrace()
+            null
         }
     }
 
+    /**
+     * get instance of a class
+     * @throws IllegalAccessException if the action is failed
+     */
+    fun <T : Any> getInstance(clazz: Class<T>): T {
+        return getInstanceOrNull(clazz) ?: throw IllegalStateException("can't get instance of $clazz")
+    }
+
+    /**
+     * get kotlin object instance if not return null
+     */
     fun <T : Any> getKotlinObjectInstance(clazz: Class<T>): T? {
         return try {
             clazz.getDeclaredField("INSTANCE").get(null) as T // kotlin object INSTANCE field is nonnull
         } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }
+
+    /**
+     * invoke a constructor with specified parameters
+     * @throws NoSuchMethodException if failed to find constructor
+     */
+    fun invokeConstructor(clazz: Class<*>, vararg args: Any): Any {
+        try {
+            val constructor = args.map { if(it is NullValue) { it.clazz } else { it.javaClass } }.let {
+                clazz.getConstructor(*it.toTypedArray())
+            }
+            return args.map { if(it is NullValue) { null } else { it } }.let {
+                constructor.newInstance(*it.toTypedArray())
+            }
+        } catch (e: NoSuchMethodException) {
+            throw NoSuchMethodException("Cannot find constructor of $clazz")
+        }
+    }
+
+    fun getValuesNoCache(obj: Any) = obj.javaClass.declaredFields.map { field ->
+        field.isAccessible = true
+        field.get(obj)
+    }.filterIsInstance<Value<*>>()
+
+    fun getValues(obj: Any)
+            = valueCache[obj.javaClass] ?: getValuesNoCache(obj).also { valueCache[obj.javaClass] = it }
+
+    /**
+     * a class for storage null value and original parameter type
+     */
+    class NullValue(val clazz: Class<*>)
 
     enum class MinecraftEnv {
         NOTCH,

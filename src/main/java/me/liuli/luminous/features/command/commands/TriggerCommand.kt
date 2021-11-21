@@ -1,6 +1,7 @@
 package me.liuli.luminous.features.command.commands
 
 import me.liuli.luminous.features.command.Command
+import me.liuli.luminous.features.config.ConfigManager
 import me.liuli.luminous.features.module.ModuleManager
 import me.liuli.luminous.features.module.ModuleTriggerType
 import me.liuli.luminous.utils.misc.logError
@@ -25,6 +26,7 @@ class TriggerCommand : Command("trigger", "Change the trigger type of a module")
         }
 
         module.triggerType = type
+        ConfigManager.scheduleSave()
         logInfo("TriggerType of ${module.name} changed to ${type.name}")
     }
 

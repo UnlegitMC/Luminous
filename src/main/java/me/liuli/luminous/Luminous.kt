@@ -1,6 +1,7 @@
 package me.liuli.luminous
 
 import me.liuli.luminous.agent.Agent
+import me.liuli.luminous.event.EventManager
 import me.liuli.luminous.features.command.CommandManager
 import me.liuli.luminous.features.config.ConfigManager
 import me.liuli.luminous.features.module.ModuleManager
@@ -48,11 +49,15 @@ object Luminous {
         logInfo("Loading client...")
 
         // initialize kotlin objects
+        EventManager
+
         ConfigManager
         CommandManager
         ModuleManager
 
         HudManager
+
+        ConfigManager.loadAll()
     }
 
     /**

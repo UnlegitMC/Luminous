@@ -1,6 +1,7 @@
 package me.liuli.luminous.features.command.commands
 
 import me.liuli.luminous.features.command.Command
+import me.liuli.luminous.features.config.ConfigManager
 import me.liuli.luminous.features.module.ModuleManager
 import me.liuli.luminous.features.value.*
 import me.liuli.luminous.utils.misc.logError
@@ -37,6 +38,7 @@ class SetCommand : Command("set", "Change a value of a module") {
             return
         }
 
+        ConfigManager.scheduleSave()
         logInfo("Set ${value.name} in module ${module.name} to ${value.value}")
     }
 }

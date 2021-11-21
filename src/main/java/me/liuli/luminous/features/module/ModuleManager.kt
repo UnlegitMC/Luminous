@@ -8,6 +8,7 @@ object ModuleManager: Listener {
     val modules = mutableListOf<Module>()
 
     init {
+        EventManager.registerListener(this)
         AccessUtils.resolvePackage("me.liuli.luminous.features.module.modules", Module::class.java)
             .forEach(this::registerModule)
     }

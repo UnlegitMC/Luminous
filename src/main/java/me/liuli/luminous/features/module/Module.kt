@@ -1,7 +1,9 @@
 package me.liuli.luminous.features.module
 
 import me.liuli.luminous.event.Listener
+import me.liuli.luminous.features.config.ConfigManager
 import me.liuli.luminous.features.value.Value
+import me.liuli.luminous.utils.jvm.AccessUtils
 import org.lwjgl.input.Keyboard
 
 open class Module(
@@ -29,6 +31,7 @@ open class Module(
            } else {
                onDisable()
            }
+           ConfigManager.scheduleSave()
        }
 
     fun toggle() {
@@ -39,10 +42,8 @@ open class Module(
 
     open fun onDisable() {}
 
-    val values = javaClass.declaredFields.map { field ->
-            field.isAccessible = true
-            field.get(this)
-        }.filterIsInstance<Value<*>>()
+    val values: List<Value<*>>
+        get() = AccessUtils.getValues(this)
 
     /**
      * get a value but with kotlin feature

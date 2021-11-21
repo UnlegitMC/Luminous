@@ -1,5 +1,7 @@
 package me.liuli.luminous.agent.hook.impl
 
+import me.liuli.luminous.utils.misc.logError
+
 /**
  * a container for method hooks
  */
@@ -10,7 +12,11 @@ abstract class HookFunction(val targetClass: Class<*>) {
         this.javaClass.declaredMethods.forEach { method ->
             val hook = method.getAnnotation(Hook::class.java)
             if(hook != null) {
-                hookedMethods.add(HookMethod(this, method, hook))
+                try {
+                    hookedMethods.add(HookMethod(this, method, hook))
+                } catch (e: Exception) {
+                    logError("Failed to load hook method for class \"${targetClass.canonicalName}\" ($e)")
+                }
             }
         }
     }

@@ -130,13 +130,13 @@ class WrappedClass(val name: String, val superclass: String) {
         val sb = StringBuilder()
 
         sb.append("package wrapped.${name.substring(0, name.lastIndexOf("."))}\n\n")
-        sb.append("import me.liuli.luminous.wrapper.WrapManager\n\n")
+        sb.append("import me.liuli.luminous.utils.jvm.AccessUtils\n\n")
         sb.append("open class ${name.substring(name.lastIndexOf(".") + 1)}(${if(superType.startsWith("wrapped")) {""} else {"val "}}theInstance: Any = originalClass.newInstance())${if(superType.startsWith("wrapped")) {":$superType(theInstance)"}else{""}} {\n")
         fields.forEach { putField(sb, it, false) }
         methods.forEach { putMethod(sb, it, false) }
         sb.append("\tcompanion object {\n")
         sb.append("\t\tval className = \"$name\"\n")
-        sb.append("\t\tval originalClass = WrapManager.origin(className)\n")
+        sb.append("\t\tval originalClass = AccessUtils.getObfClass(className)\n")
         fields.forEach { putField(sb, it, true) }
         methods.forEach { putMethod(sb, it, true) }
         sb.append("\t}\n")
@@ -153,10 +153,10 @@ class WrappedClass(val name: String, val superclass: String) {
             sb.append(if (isForStatic) {"\t\t"} else {"\t"})
             sb.append("${if (wf.isFinal) {"val"} else {"var"}} ${wf.name}: $type? ")
             putJvmName(sb, "G${wf.modifier}_${wf.name}")
-            sb.append("get() { return ${processWrapHead(type)}WrapManager.getter($instance, className, \"${wf.name}\")${processWrapTail(type)} }")
+            sb.append("get() { return ${processWrapHead(type)}AccessUtils.getObfField(originalClass, \"${wf.name}\").get($instance)${processWrapTail(type)} }")
             if(!wf.isFinal) {
                 putJvmName(sb, "S${wf.modifier}_${wf.name}")
-                sb.append("set(value) { WrapManager.setter($instance, className, \"${wf.name}\", value${processWrapGet(type)}) }")
+                sb.append("set(value) { AccessUtils.getObfField(originalClass, \"${wf.name}\").set($instance, value${processWrapGet(type)}) }")
             }
             sb.append("\n")
         }
@@ -180,7 +180,7 @@ class WrappedClass(val name: String, val superclass: String) {
             putJvmName(sb, "M${wm.modifier}${split[0]}${Math.random().toString().substring(2,5)}")
             sb.append("fun ${split[0]}($args)")
             if(type!="Unit") sb.append(": $type?")
-            sb.append("{ ${if(type!="Unit"){"return"}else{""}} ${processWrapHead(type)}WrapManager.call($instance, className, \"${split[0]}\", \"${split[1].replace("\$", "\\\$")}\"")
+            sb.append("{ ${if(type!="Unit"){"return"}else{""}} ${processWrapHead(type)}AccessUtils.getObfMethod(originalClass, \"${split[0]}\", \"${split[1].replace("\$", "\\\$")}\").invoke($instance")
             if(args.isNotEmpty()) sb.append(", ${argsStr.substring(0, argsStr.length-1)}")
             sb.append(")${if(type!="Unit"){processWrapTail(type)}else{""}} }\n")
         }

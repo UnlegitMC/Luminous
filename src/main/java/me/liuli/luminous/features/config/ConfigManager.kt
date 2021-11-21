@@ -3,11 +3,14 @@ package me.liuli.luminous.features.config
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Klaxon
 import me.liuli.luminous.Luminous
+import me.liuli.luminous.event.*
 import me.liuli.luminous.utils.jvm.AccessUtils
+import me.liuli.luminous.utils.misc.logInfo
+import me.liuli.luminous.utils.timing.TheTimer
 import java.io.File
 import kotlin.text.Charsets.UTF_8
 
-object ConfigManager {
+object ConfigManager: Listener {
     private val KLAXON = Klaxon()
 
     val configDir = File(Luminous.dataDir, "configs")
@@ -26,13 +29,15 @@ object ConfigManager {
             configDir.mkdirs()
         }
 
-        loadAll()
+        EventManager.registerListener(this)
     }
 
     /**
      * load non-unique config
      */
     fun loadConfig(isUnique: Boolean) {
+        logInfo("Loading config... (isUnique=$isUnique)")
+
         val json = readConfigJson(if(isUnique) { uniqueConfigFile } else { configFile })
 
         sections.filter { it.isUnique == isUnique }.forEach { section ->
@@ -44,6 +49,8 @@ object ConfigManager {
      * write non-unique config into file
      */
     fun writeConfig(isUnique: Boolean) {
+        logInfo("Saving config to disk... (isUnique=$isUnique)")
+
         val json = JsonObject()
 
         sections.filter { it.isUnique == isUnique }.forEach { section ->
@@ -95,4 +102,26 @@ object ConfigManager {
     private fun writeConfigJson(file: File, json: JsonObject) {
         file.writeText(json.toJsonString(true))
     }
+
+    private var saveScheduled = false
+    private val scheduleTimer = TheTimer()
+
+    fun scheduleSave() {
+        saveScheduled = true
+    }
+
+    @EventHandler
+    fun onTick(event: TickEvent) {
+        if(saveScheduled && scheduleTimer.hasTimePassed(15000)) { // 15 seconds
+            saveScheduled = false
+            scheduleTimer.reset()
+            Thread { // klaxon is not as fast as gson, so we use thread to save config
+                writeAll()
+                logInfo("Config saved for schedule")
+            }.start()
+        }
+    }
+
+    override val listen: Boolean
+        get() = saveScheduled
 }

@@ -7,6 +7,16 @@ abstract class Value<T>(val name: String, valueIn: T) {
         protected set
     val defaultValue = value
 
+    private var displayableFunc: () -> Boolean = { true }
+
+    fun displayable(func: () -> Boolean): Value<T> {
+        displayableFunc = func
+        return this
+    }
+
+    val displayable: Boolean
+        get() = displayableFunc()
+
     fun set(newValue: T) {
         if (newValue == value) return
 
