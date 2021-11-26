@@ -1,5 +1,6 @@
 package me.liuli.luminous.event
 
+import wrapped.net.minecraft.client.gui.ScaledResolution
 import wrapped.net.minecraft.client.multiplayer.WorldClient
 import wrapped.net.minecraft.entity.Entity
 
@@ -21,7 +22,7 @@ class PushOutEvent : EventCancellable()
 
 class AttackEvent(val targetEntity: Entity) : EventCancellable()
 
-class Render2DEvent(val partialTicks: Float) : Event()
+class Render2DEvent(val sr: ScaledResolution, val partialTicks: Float) : Event()
 
 class Render3DEvent(val partialTicks: Float) : Event()
 

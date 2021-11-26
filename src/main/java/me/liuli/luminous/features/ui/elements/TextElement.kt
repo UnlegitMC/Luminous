@@ -1,6 +1,7 @@
-package me.liuli.luminous.features.ui.hud.elements
+package me.liuli.luminous.features.ui.elements
 
-import me.liuli.luminous.features.ui.hud.HudElement
+import me.liuli.luminous.event.Render2DEvent
+import me.liuli.luminous.features.ui.HudElement
 import me.liuli.luminous.features.value.BoolValue
 import me.liuli.luminous.features.value.IntValue
 import me.liuli.luminous.features.value.StringValue
@@ -15,7 +16,7 @@ class TextElement : HudElement("Text") {
     private val alphaValue = IntValue("Alpha", 255, 0, 255)
     private val shadow = BoolValue("Shadow", false)
 
-    override fun render() {
+    override fun render(event: Render2DEvent) {
         mc.fontRendererObj!!.drawString(displayString.value, 0f, 0f
             , Color(redValue.value, greenValue.value, blueValue.value, alphaValue.value).rgb, shadow.value)
     }

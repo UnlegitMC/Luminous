@@ -1,5 +1,6 @@
-package me.liuli.luminous.features.ui.hud
+package me.liuli.luminous.features.ui
 
+import me.liuli.luminous.event.Render2DEvent
 import me.liuli.luminous.features.value.Value
 import me.liuli.luminous.utils.jvm.AccessUtils
 
@@ -22,7 +23,7 @@ abstract class HudElement(val name: String, var x: Float = 0f, var y: Float = 0f
     var renderY: Float
         get() = when (side.vertical) {
             ElementSide.Vertical.UP -> y
-            ElementSide.Vertical.MIDDLE -> (HudManager.scaledHeight/ 2) - y
+            ElementSide.Vertical.MIDDLE -> (HudManager.scaledHeight / 2) - y
             ElementSide.Vertical.DOWN -> HudManager.scaledHeight - y
         }
         set(value) = when (side.vertical) {
@@ -37,7 +38,7 @@ abstract class HudElement(val name: String, var x: Float = 0f, var y: Float = 0f
     /**
      * called every [me.liuli.luminous.event.Render2DEvent]
      */
-    abstract fun render()
+    abstract fun render(event: Render2DEvent)
 
     /**
      * called every [me.liuli.luminous.event.UpdateEvent]

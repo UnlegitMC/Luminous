@@ -1,4 +1,4 @@
-package me.liuli.luminous.features.ui.hud
+package me.liuli.luminous.features.ui
 
 import com.beust.klaxon.JsonObject
 

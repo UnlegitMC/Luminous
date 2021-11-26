@@ -8,6 +8,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import wrapped.net.minecraft.client.gui.ScaledResolution
 import wrapped.net.minecraft.client.multiplayer.WorldClient
 
 class ForgeEventHandler {
@@ -24,7 +25,7 @@ class ForgeEventHandler {
 
     @SubscribeEvent
     fun onRender2d(event: RenderGameOverlayEvent) {
-        EventManager.callEvent(me.liuli.luminous.event.Render2DEvent(event.partialTicks))
+        EventManager.callEvent(me.liuli.luminous.event.Render2DEvent(ScaledResolution(event.get("resolution")), event.partialTicks))
     }
 
     @SubscribeEvent

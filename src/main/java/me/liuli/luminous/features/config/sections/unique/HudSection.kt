@@ -3,8 +3,8 @@ package me.liuli.luminous.features.config.sections.unique
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import me.liuli.luminous.features.config.ConfigSection
-import me.liuli.luminous.features.ui.hud.ElementSide
-import me.liuli.luminous.features.ui.hud.HudManager
+import me.liuli.luminous.features.ui.ElementSide
+import me.liuli.luminous.features.ui.HudManager
 import me.liuli.luminous.utils.jvm.AccessUtils
 import me.liuli.luminous.utils.misc.JsonUtils
 

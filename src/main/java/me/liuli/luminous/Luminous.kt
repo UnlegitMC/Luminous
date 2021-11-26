@@ -5,7 +5,7 @@ import me.liuli.luminous.event.EventManager
 import me.liuli.luminous.features.command.CommandManager
 import me.liuli.luminous.features.config.ConfigManager
 import me.liuli.luminous.features.module.ModuleManager
-import me.liuli.luminous.features.ui.hud.HudManager
+import me.liuli.luminous.features.ui.HudManager
 import me.liuli.luminous.loader.Loader
 import me.liuli.luminous.utils.misc.logError
 import me.liuli.luminous.utils.misc.logInfo
