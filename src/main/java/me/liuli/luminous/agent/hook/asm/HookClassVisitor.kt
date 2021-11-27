@@ -13,7 +13,6 @@ class HookClassVisitor(classVisitor: ClassVisitor, val function: HookFunction) :
             return methodVisitor
         }
 
-
         return HookMethodVisitor(hookMethodList, methodVisitor, access, name, desc)
     }
 }

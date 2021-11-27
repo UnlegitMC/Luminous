@@ -2,10 +2,8 @@ package me.liuli.luminous.features.ui
 
 import me.liuli.luminous.event.*
 import me.liuli.luminous.features.ui.panel.ThePanel
-import me.liuli.luminous.utils.game.mc
 import me.liuli.luminous.utils.jvm.AccessUtils
 import me.liuli.luminous.utils.misc.logError
-import me.liuli.luminous.utils.misc.logInfo
 import org.lwjgl.opengl.GL11
 
 object HudManager: Listener {
@@ -19,12 +17,8 @@ object HudManager: Listener {
     var scaleFactor = 0
         private set
 
-    // for panel
-    private val guiChatClass = AccessUtils.getObfClass("net.minecraft.client.gui.GuiChat")
-
     init {
         EventManager.registerListener(this)
-        ThePanel
     }
 
     @EventHandler
@@ -45,9 +39,6 @@ object HudManager: Listener {
             }
 
             GL11.glPopMatrix()
-        }
-        if(guiChatClass.isInstance(mc.currentScreen?.theInstance ?: this)) {
-            ThePanel.onRender(event)
         }
     }
 

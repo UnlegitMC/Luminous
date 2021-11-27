@@ -29,7 +29,7 @@ class HookMethodVisitor(val hookMethodList: List<HookMethod>, methodVisitor: Met
      */
     private fun injectCall(hookMethod: HookMethod) {
         // inject simple hook to pass the parameters to HookManager
-        mv.visitLdcInsn("${hookMethod.hookFunction.javaClass.name}/${hookMethod.method.name}!${hookMethod.method.signature}")
+        mv.visitLdcInsn(hookMethod.id)
         var i = 0
         if(Modifier.isStatic(hookMethod.targetMethod.modifiers)) {
             mv.visitInsn(ACONST_NULL) // pass null for static method
@@ -59,6 +59,22 @@ class HookMethodVisitor(val hookMethodList: List<HookMethod>, methodVisitor: Met
                     mv.visitVarInsn(DLOAD, i)
                     mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;")
                     i++
+                }
+                "char" -> {
+                    mv.visitVarInsn(ILOAD, i)
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;")
+                }
+                "byte" -> {
+                    mv.visitVarInsn(ILOAD, i)
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;")
+                }
+                "short" -> {
+                    mv.visitVarInsn(ILOAD, i)
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;")
+                }
+                "boolean" -> {
+                    mv.visitVarInsn(ILOAD, i)
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;")
                 }
                 else -> mv.visitVarInsn(ALOAD, i)
             }

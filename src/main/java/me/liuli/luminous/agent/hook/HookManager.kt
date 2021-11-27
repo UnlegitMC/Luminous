@@ -35,7 +35,7 @@ object HookManager {
         }
         hookFunctions.add(hookFunction)
         hookFunction.hookedMethods.forEach {
-            hookMethodCache["${hookFunction.javaClass.name}/${it.method.name}!${it.method.signature}"] = it
+            hookMethodCache[it.id] = it
         }
     }
 
